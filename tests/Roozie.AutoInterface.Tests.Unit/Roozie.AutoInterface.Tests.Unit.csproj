@@ -7,4 +7,8 @@
     <IsPackable>false</IsPackable>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Roozie.AutoInterface\Roozie.AutoInterface.csproj"/>
+  </ItemGroup>
 </Project>
