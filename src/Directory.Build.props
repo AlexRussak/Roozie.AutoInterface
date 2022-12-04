@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn)</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- https://docs.microsoft.com/en-us/visualstudio/code-quality/install-net-analyzers?view=vs-2022 -->
+    <!-- https://docs.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#enablenetanalyzers -->
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="System.Globalization"/>
+    <Using Include="System.Text"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.756">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22518.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.4.27">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>
