@@ -95,7 +95,9 @@ internal static class InterfaceExtractor
 
         return new(
             interfaceName ?? "I" + classSymbol.Name,
-            classSymbol.ContainingNamespace.Name,
+            classSymbol.ContainingNamespace.IsGlobalNamespace
+                ? string.Empty
+                : classSymbol.ContainingNamespace.ToString(),
             methods.ToArray(),
             properties.ToArray(),
             classDoc);
