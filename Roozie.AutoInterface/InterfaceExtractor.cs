@@ -30,8 +30,6 @@ internal static class InterfaceExtractor
             return null;
         }
 
-        var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
-
         string? interfaceName = null;
         var generateAllMethods = true;
         var generateAllProperties = true;
@@ -92,11 +90,20 @@ internal static class InterfaceExtractor
             }
         }
 
+        var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
+        var usings = root.Usings
+            .Select(u => u.Name.ToString())
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(u => u)
+            .ToImmutableArray();
+        var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
         return new(
             interfaceName ?? "I" + classSymbol.Name,
             classSymbol.ContainingNamespace.IsGlobalNamespace
                 ? string.Empty
                 : classSymbol.ContainingNamespace.ToString(),
+            usings,
             methods.ToArray(),
             properties.ToArray(),
             classDoc);

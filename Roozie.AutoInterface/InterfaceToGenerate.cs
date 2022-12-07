@@ -3,6 +3,7 @@ namespace Roozie.AutoInterface;
 internal record struct InterfaceToGenerate(
     string Name,
     string Namespace,
+    IReadOnlyCollection<string> Usings,
     MethodToGenerate[] Methods,
     PropertyToGenerate[] Properties,
     string? XmlDoc

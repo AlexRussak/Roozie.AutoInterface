@@ -6,16 +6,21 @@ internal static class InterfaceGenerator
     {
         const string spacer = "    ";
 
-        var interfaceName = toGenerate.Name;
-
         var sb = new StringBuilder();
-        sb.Append("using System.CodeDom.Compiler;").AppendLine();
+        foreach (var u in toGenerate.Usings
+                     .Concat(new[] { "System.CodeDom.Compiler" }) // for GeneratedCodeAttribute
+                     .Distinct(StringComparer.Ordinal)
+                     .OrderBy(s => s, StringComparer.Ordinal))
+        {
+            sb.Append($"using {u};").AppendLine();
+        }
+
         sb.Append(@"namespace ").AppendLine($"{toGenerate.Namespace};");
         sb.AppendLine("#nullable enable").AppendLine();
 
         AddXmlDoc(sb, toGenerate.XmlDoc, null);
         sb.AppendLine($@"[GeneratedCode(""{Shared.Namespace}"", ""{version}"")]");
-        sb.AppendLine($@"public partial interface {interfaceName}");
+        sb.AppendLine($@"public partial interface {toGenerate.Name}");
         sb.AppendLine("{");
 
         foreach (var property in toGenerate.Properties)
@@ -58,7 +63,7 @@ internal static class InterfaceGenerator
         sb.Length--; // Remove last newline
         sb.AppendLine("}");
 
-        return (interfaceName, sb.ToString());
+        return (toGenerate.Name, sb.ToString());
     }
 
     private static void AddXmlDoc(StringBuilder sb, string? xmlDoc, string? indent)
