@@ -1,5 +1,3 @@
-using Roozie.AutoInterface.Definitions;
-
 namespace Roozie.AutoInterface;
 
 internal static class InterfaceGenerator

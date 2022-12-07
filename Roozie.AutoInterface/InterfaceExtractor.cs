@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Roozie.AutoInterface.Definitions;
 
 namespace Roozie.AutoInterface;
 
