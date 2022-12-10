@@ -80,7 +80,7 @@ using Roozie.AutoInterface;
 
 namespace Roozie.AutoInterface.Tests;
 
-[AutoInterface(GenerateAllMethods = false, GenerateAllProperties = false)]
+[AutoInterface(IncludeMethods = false, IncludeProperties = false)]
 public class {{nameof(AddToInterface_Attribute)}}
 {
     public string? Test { get; private set; }

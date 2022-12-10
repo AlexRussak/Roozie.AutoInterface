@@ -7,6 +7,8 @@ namespace Roozie.AutoInterface.Tests;
 
 public partial interface IAddToInterface_Attribute
 {
+    string? Test {get;}
+
     string? TestPropWithAttribute {get;set;}
 
     string? TestPropWithAttributePrivateSet {get;}

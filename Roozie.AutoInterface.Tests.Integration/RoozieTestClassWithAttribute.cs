@@ -12,7 +12,7 @@ namespace Roozie.AutoInterface.Tests.Integration;
 /// <summary>
 /// class documentation
 /// </summary>
-[AutoInterface(GenerateAllMethods = false, GenerateAllProperties = false)]
+[AutoInterface(IncludeMethods = false, IncludeProperties = false)]
 public class RoozieTestClassWithAttribute : IRoozieTestClassWithAttribute
 {
     /// <summary>

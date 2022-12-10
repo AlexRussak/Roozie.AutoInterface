@@ -26,14 +26,14 @@ internal static class InterfaceExtractor
         }
 
         var semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-        if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax, ct) is not INamedTypeSymbol classSymbol)
+        if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax, ct) is not { } classSymbol)
         {
             return null;
         }
 
         string? interfaceName = null;
-        var generateAllMethods = true;
-        var generateAllProperties = true;
+        var includeMethods = true;
+        var includeProperties = true;
         var attributes = classSymbol.GetAttributes();
         foreach (var attributeData in attributes)
         {
@@ -43,7 +43,7 @@ internal static class InterfaceExtractor
                 continue;
             }
 
-            (interfaceName, generateAllMethods, generateAllProperties) = GetAttributeSettings(attributeData);
+            (interfaceName, includeMethods, includeProperties) = GetAttributeSettings(attributeData);
             break;
         }
 
@@ -57,7 +57,7 @@ internal static class InterfaceExtractor
             }
 
             var memberContainsAttribute = false;
-            if (generateAllMethods && generateAllProperties)
+            if (includeMethods && includeProperties)
             {
                 memberContainsAttribute = true;
             }
@@ -78,12 +78,12 @@ internal static class InterfaceExtractor
                 case IMethodSymbol method
                     when ObjectMethods.Contains(method.Name, StringComparer.Ordinal) && method.IsOverride:
                     continue;
-                case IMethodSymbol when !generateAllMethods && !memberContainsAttribute:
+                case IMethodSymbol when !includeMethods && !memberContainsAttribute:
                     continue;
                 case IMethodSymbol method:
                     methods.Add(ConvertMethod(method, ct));
                     break;
-                case IPropertySymbol when !generateAllProperties && !memberContainsAttribute:
+                case IPropertySymbol when !includeProperties && !memberContainsAttribute:
                     continue;
                 case IPropertySymbol propertySymbol:
                     properties.Add(ConvertProperty(propertySymbol, ct));
@@ -111,12 +111,12 @@ internal static class InterfaceExtractor
             classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword));
     }
 
-    private static (string? interfaceName, bool generateAllMethods, bool generateAllProperties)
+    private static (string? interfaceName, bool includeMethods, bool includeProperties)
         GetAttributeSettings(AttributeData attributeData)
     {
         string? interfaceName = null;
-        bool? generateAllMethods = null;
-        bool? generateAllProperties = null;
+        bool? includeMethods = null;
+        bool? includeProperties = null;
 
         foreach (var kvp in attributeData.NamedArguments)
         {
@@ -127,20 +127,20 @@ internal static class InterfaceExtractor
                 interfaceName = s;
             }
 
-            if (string.Equals(kvp.Key, "GenerateAllMethods", StringComparison.Ordinal)
+            if (string.Equals(kvp.Key, "IncludeMethods", StringComparison.Ordinal)
                 && kvp.Value.Value is bool methodsFlag)
             {
-                generateAllMethods = methodsFlag;
+                includeMethods = methodsFlag;
             }
 
-            if (string.Equals(kvp.Key, "GenerateAllProperties", StringComparison.Ordinal)
+            if (string.Equals(kvp.Key, "IncludeProperties", StringComparison.Ordinal)
                 && kvp.Value.Value is bool propertiesFlag)
             {
-                generateAllProperties = propertiesFlag;
+                includeProperties = propertiesFlag;
             }
         }
 
-        return (interfaceName, generateAllMethods ?? true, generateAllProperties ?? true);
+        return (interfaceName, includeMethods ?? true, includeProperties ?? true);
     }
 
     private static MethodToGenerate ConvertMethod(IMethodSymbol method, CancellationToken ct) =>

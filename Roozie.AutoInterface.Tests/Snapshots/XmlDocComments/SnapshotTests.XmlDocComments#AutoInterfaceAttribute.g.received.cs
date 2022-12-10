@@ -10,18 +10,18 @@ internal sealed class AutoInterfaceAttribute : Attribute
 {
     public AutoInterfaceAttribute()
     {
-        GenerateAllMethods = true;
-        GenerateAllProperties = true;
+        IncludeMethods = true;
+        IncludeProperties = true;
     }
 
-    public AutoInterfaceAttribute(string? name, bool generateAllMethods = true, bool generateAllProperties = true)
+    public AutoInterfaceAttribute(string? name, bool includeMethods = true, bool includeProperties = true)
     {
         Name = name;
-        GenerateAllMethods = generateAllMethods;
-        GenerateAllProperties = generateAllProperties;
+        IncludeMethods = includeMethods;
+        IncludeProperties = includeProperties;
     }
 
     public string? Name { get; set; }
-    public bool GenerateAllMethods { get; set; } = true;
-    public bool GenerateAllProperties { get; set; } = true;
+    public bool IncludeMethods { get; set; } = true;
+    public bool IncludeProperties { get; set; } = true;
 }
