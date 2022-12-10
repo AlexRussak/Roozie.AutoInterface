@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Config", "_Config", "{FA5A
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roozie.AutoInterface.Tests.Integration", "Roozie.AutoInterface.Tests.Integration\Roozie.AutoInterface.Tests.Integration.csproj", "{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{EDAD3BF7-32EF-417D-8D18-96512AF38D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDAD3BF7-32EF-417D-8D18-96512AF38D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDAD3BF7-32EF-417D-8D18-96512AF38D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
