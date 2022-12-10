@@ -25,6 +25,10 @@ public class {{nameof(Simple)}}
     public string TestMethod(string input) => input;
     private string TestMethodPrivate(string input) => input;
     internal string TestMethodInternal(string input) => input;
+
+    public override bool Equals(object? obj) => base.Equals(obj);
+    public override string ToString() => base.ToString();
+    public override int GetHashCode() => base.GetHashCode();
 }
 """;
         return TestHelper.Verify(source);
@@ -40,7 +44,7 @@ using Roozie.AutoInterface;
 namespace Roozie.AutoInterface.Tests;
 
 [AutoInterface(Name = "ADifferentInterfaceName")]
-public class {{nameof(InterfaceName)}}
+public partial class {{nameof(InterfaceName)}}
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string TestMethod(string input) => input;

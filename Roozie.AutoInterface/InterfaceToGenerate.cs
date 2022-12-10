@@ -1,12 +1,14 @@
 namespace Roozie.AutoInterface;
 
 internal record struct InterfaceToGenerate(
-    string Name,
+    string ClassName,
+    string InterfaceName,
     string Namespace,
     IReadOnlyCollection<string> Usings,
     MethodToGenerate[] Methods,
     PropertyToGenerate[] Properties,
-    string? XmlDoc
+    string? XmlDoc,
+    bool IsPartial
 );
 
 internal record struct MethodToGenerate(

@@ -17,8 +17,14 @@ internal static class InterfaceGenerator
         sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};");
         sb.AppendLine("#nullable enable").AppendLine();
 
+        if (toGenerate.IsPartial)
+        {
+            sb.AppendLine($"public partial class {toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
+                .AppendLine();
+        }
+
         AddXmlDoc(sb, toGenerate.XmlDoc, null);
-        sb.AppendLine($"public partial interface {toGenerate.Name}");
+        sb.AppendLine($"public partial interface {toGenerate.InterfaceName}");
         sb.AppendLine("{");
 
         foreach (var property in toGenerate.Properties)
@@ -61,7 +67,7 @@ internal static class InterfaceGenerator
         sb.Length--; // Remove last newline
         sb.AppendLine("}");
 
-        return (toGenerate.Name, sb.ToString());
+        return (toGenerate.InterfaceName, sb.ToString());
     }
 
     private static void AddXmlDoc(StringBuilder sb, string? xmlDoc, string? indent)

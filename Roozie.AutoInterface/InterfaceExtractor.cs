@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Roozie.AutoInterface;
@@ -98,6 +99,7 @@ internal static class InterfaceExtractor
             .ToImmutableArray();
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
         return new(
+            classSymbol.Name,
             interfaceName ?? "I" + classSymbol.Name,
             classSymbol.ContainingNamespace.IsGlobalNamespace
                 ? string.Empty
@@ -105,7 +107,8 @@ internal static class InterfaceExtractor
             usings,
             methods.ToArray(),
             properties.ToArray(),
-            classDoc);
+            classDoc,
+            classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword));
     }
 
     private static (string? interfaceName, bool generateAllMethods, bool generateAllProperties)

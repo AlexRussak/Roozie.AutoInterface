@@ -5,6 +5,8 @@ using System;
 namespace Roozie.AutoInterface.Tests;
 #nullable enable
 
+public partial class InterfaceName : ADifferentInterfaceName {}
+
 public partial interface ADifferentInterfaceName
 {
     System.Guid Id {get;set;}

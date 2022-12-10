@@ -4,6 +4,7 @@ namespace Roozie.AutoInterface.Tests.Integration;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Local
+#pragma warning disable CA1024
 #pragma warning disable CA1044
 #pragma warning disable CA1822
 
@@ -11,7 +12,7 @@ namespace Roozie.AutoInterface.Tests.Integration;
 /// class documentation
 /// </summary>
 [AutoInterface]
-public class RoozieTestClass : IRoozieTestClass
+public partial class RoozieTestClass
 {
     /// <summary>
     /// test doc on method
