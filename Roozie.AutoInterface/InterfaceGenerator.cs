@@ -6,26 +6,24 @@ internal static class InterfaceGenerator
     {
         const string spacer = "    ";
 
-        var sb = new StringBuilder();
-        foreach (var u in toGenerate.Usings
-                     .Concat(new[] { "System.CodeDom.Compiler" }) // for GeneratedCodeAttribute
-                     .Distinct(StringComparer.Ordinal)
-                     .OrderBy(s => s, StringComparer.Ordinal))
+        var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
+        sb.AppendLine();
+
+        foreach (var u in toGenerate.Usings.OrderBy(s => s, StringComparer.Ordinal))
         {
             sb.Append($"using {u};").AppendLine();
         }
 
-        sb.Append(@"namespace ").AppendLine($"{toGenerate.Namespace};");
+        sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};");
         sb.AppendLine("#nullable enable").AppendLine();
 
         AddXmlDoc(sb, toGenerate.XmlDoc, null);
-        sb.AppendLine($@"[GeneratedCode(""{Shared.Namespace}"", ""{version}"")]");
-        sb.AppendLine($@"public partial interface {toGenerate.Name}");
+        sb.AppendLine($"public partial interface {toGenerate.Name}");
         sb.AppendLine("{");
 
         foreach (var property in toGenerate.Properties)
         {
-            if (!property.HasGetter && property.SetType == null)
+            if (property is { HasGetter: false, SetType: null })
             {
                 continue;
             }
@@ -76,12 +74,27 @@ internal static class InterfaceGenerator
         var split = xmlDoc!.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
         foreach (var s in split)
         {
-            if (s.Contains("member"))
+            // The xml docs are wrapped in <member> tags, so we need to remove them
+            // <member name="T:Roozie.AutoInterface.Tests.TestClass">
+            // </member>
+            if (s.StartsWith("<member ", StringComparison.Ordinal) ||
+                string.Equals(s, "</member>", StringComparison.Ordinal))
             {
                 continue;
             }
 
-            sb.AppendLine($"{indent ?? string.Empty}///{s}");
+            sb.AppendLine($"{indent ?? string.Empty}///{RemoveLeadingSpaces(s, 3)}");
         }
+    }
+
+    private static string RemoveLeadingSpaces(string s, int removeCount)
+    {
+        var index = 0;
+        while (index < s.Length && index < removeCount && s[index] == ' ')
+        {
+            index++;
+        }
+
+        return s.Substring(index);
     }
 }

@@ -12,11 +12,11 @@ public class Generator : IIncrementalGenerator
     {
         var version = typeof(Generator).Assembly.GetName().Version.ToString();
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-            "AutoInterfaceAttribute.g.cs",
+            $"{AutoInterfaceAttribute.Name}.g.cs",
             SourceText.From(AutoInterfaceAttribute.Code(version), Encoding.UTF8)));
 
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-            "AddToInterfaceAttribute.g.cs",
+            $"{AddToInterfaceAttribute.Name}.g.cs",
             SourceText.From(AddToInterfaceAttribute.Code(version), Encoding.UTF8)));
 
         var classDeclarations = context.SyntaxProvider
@@ -43,8 +43,8 @@ public class Generator : IIncrementalGenerator
         }
 
         // Convert each to an interface to generate
-        var interfacesToGenerate =
-            GetTypesToGenerate(compilation, classes.Distinct(), context.CancellationToken);
+        var interfacesToGenerate = GetTypesToGenerate(compilation, classes.Distinct(),
+            context.CancellationToken);
 
         foreach (var interfaceToGenerate in interfacesToGenerate)
         {

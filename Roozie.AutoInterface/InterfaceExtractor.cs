@@ -94,7 +94,6 @@ internal static class InterfaceExtractor
         var usings = root.Usings
             .Select(u => u.Name.ToString())
             .Where(u => !string.IsNullOrWhiteSpace(u))
-            .Distinct(StringComparer.Ordinal)
             .OrderBy(u => u)
             .ToImmutableArray();
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);

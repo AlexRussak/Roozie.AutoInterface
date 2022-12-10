@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -5,7 +6,7 @@ namespace Roozie.AutoInterface.Tests;
 
 public static class TestHelper
 {
-    public static Task Verify(string source)
+    public static Task Verify(string source, [CallerMemberName] string memberName = "")
     {
         // Parse the provided string into a C# syntax tree
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
@@ -35,6 +36,6 @@ public static class TestHelper
         // Use verify to snapshot test the source generator output!
         return Verifier
             .Verify(driver)
-            .UseDirectory("Snapshots");
+            .UseDirectory(Path.Combine("Snapshots", memberName));
     }
 }

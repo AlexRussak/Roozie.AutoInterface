@@ -5,17 +5,16 @@ internal static class AddToInterfaceAttribute
     public const string Name = "AddToInterfaceAttribute";
     public const string FullName = $"{Shared.Namespace}.{Name}";
 
-    public static string Code(string version) => @$"
+    public static string Code(string version) => $$"""
+{{Shared.GetGeneratedFileComment(version)}}
 using System;
-using System.CodeDom.Compiler;
 
-namespace {Shared.Namespace};
+namespace {{Shared.Namespace}};
 #nullable enable
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
-[GeneratedCode(""{Shared.Namespace}"", ""{version}"")]
-internal sealed class {Name} : Attribute
-{{
-}}
-";
+internal sealed class {{Name}} : Attribute
+{
+}
+""";
 }
