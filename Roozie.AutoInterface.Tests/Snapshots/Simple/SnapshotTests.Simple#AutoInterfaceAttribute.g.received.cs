@@ -24,4 +24,5 @@ internal sealed class AutoInterfaceAttribute : Attribute
     public string? Name { get; set; }
     public bool IncludeMethods { get; set; } = true;
     public bool IncludeProperties { get; set; } = true;
+    public bool ImplementOnPartialClass { get; set; } = true;
 }

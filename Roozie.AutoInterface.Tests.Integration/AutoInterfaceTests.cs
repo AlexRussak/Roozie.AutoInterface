@@ -3,9 +3,9 @@ namespace Roozie.AutoInterface.Tests.Integration;
 public class AutoInterfaceTests
 {
     [Fact]
-    public async Task RoozieTestClass_VerifyInterface()
+    public async Task RoozieTestClassPartial_VerifyInterface()
     {
-        IRoozieTestClass target = new RoozieTestClass();
+        IRoozieTestClassPartial target = new RoozieTestClassPartial();
 
         target.NoParamMethod().Should().BeTrue();
         (await target.DoSomethingAsync(42)).Should().Be(84);

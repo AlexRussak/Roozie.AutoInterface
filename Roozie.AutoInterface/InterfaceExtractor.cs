@@ -31,9 +31,7 @@ internal static class InterfaceExtractor
             return null;
         }
 
-        string? interfaceName = null;
-        var includeMethods = true;
-        var includeProperties = true;
+        GeneratorSettings? settings = null;
         var attributes = classSymbol.GetAttributes();
         foreach (var attributeData in attributes)
         {
@@ -43,8 +41,13 @@ internal static class InterfaceExtractor
                 continue;
             }
 
-            (interfaceName, includeMethods, includeProperties) = GetAttributeSettings(attributeData);
+            settings = GetSettings(attributeData);
             break;
+        }
+
+        if (settings == null)
+        {
+            return null;
         }
 
         var methods = new List<MethodToGenerate>();
@@ -57,7 +60,7 @@ internal static class InterfaceExtractor
             }
 
             var memberContainsAttribute = false;
-            if (includeMethods && includeProperties)
+            if (settings is { IncludeMethods: true, IncludeProperties: true })
             {
                 memberContainsAttribute = true;
             }
@@ -78,12 +81,12 @@ internal static class InterfaceExtractor
                 case IMethodSymbol method
                     when ObjectMethods.Contains(method.Name, StringComparer.Ordinal) && method.IsOverride:
                     continue;
-                case IMethodSymbol when !includeMethods && !memberContainsAttribute:
+                case IMethodSymbol when !settings.Value.IncludeMethods && !memberContainsAttribute:
                     continue;
                 case IMethodSymbol method:
                     methods.Add(ConvertMethod(method, ct));
                     break;
-                case IPropertySymbol when !includeProperties && !memberContainsAttribute:
+                case IPropertySymbol when !settings.Value.IncludeProperties && !memberContainsAttribute:
                     continue;
                 case IPropertySymbol propertySymbol:
                     properties.Add(ConvertProperty(propertySymbol, ct));
@@ -97,10 +100,14 @@ internal static class InterfaceExtractor
             .Where(u => !string.IsNullOrWhiteSpace(u))
             .OrderBy(u => u)
             .ToImmutableArray();
+
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
+
+        var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
+                               settings.Value.ImplementOnPartial;
         return new(
             classSymbol.Name,
-            interfaceName ?? "I" + classSymbol.Name,
+            settings.Value.InterfaceName ?? "I" + classSymbol.Name,
             classSymbol.ContainingNamespace.IsGlobalNamespace
                 ? string.Empty
                 : classSymbol.ContainingNamespace.ToString(),
@@ -108,15 +115,16 @@ internal static class InterfaceExtractor
             methods.ToArray(),
             properties.ToArray(),
             classDoc,
-            classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword));
+            implementPartial
+        );
     }
 
-    private static (string? interfaceName, bool includeMethods, bool includeProperties)
-        GetAttributeSettings(AttributeData attributeData)
+    private static GeneratorSettings GetSettings(AttributeData attributeData)
     {
         string? interfaceName = null;
         bool? includeMethods = null;
         bool? includeProperties = null;
+        bool? implementOnPartial = null;
 
         foreach (var kvp in attributeData.NamedArguments)
         {
@@ -138,9 +146,15 @@ internal static class InterfaceExtractor
             {
                 includeProperties = propertiesFlag;
             }
+
+            if (string.Equals(kvp.Key, "ImplementOnPartial", StringComparison.Ordinal)
+                && kvp.Value.Value is bool partialFlag)
+            {
+                implementOnPartial = partialFlag;
+            }
         }
 
-        return (interfaceName, includeMethods ?? true, includeProperties ?? true);
+        return new(interfaceName, includeMethods ?? true, includeProperties ?? true, implementOnPartial ?? true);
     }
 
     private static MethodToGenerate ConvertMethod(IMethodSymbol method, CancellationToken ct) =>

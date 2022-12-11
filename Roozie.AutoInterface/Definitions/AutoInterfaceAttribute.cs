@@ -31,6 +31,7 @@ internal sealed class {{Name}} : Attribute
     public string? Name { get; set; }
     public bool IncludeMethods { get; set; } = true;
     public bool IncludeProperties { get; set; } = true;
+    public bool ImplementOnPartial { get; set; } = true;
 }
 """;
 }

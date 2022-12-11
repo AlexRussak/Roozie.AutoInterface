@@ -8,7 +8,7 @@ internal record struct InterfaceToGenerate(
     MethodToGenerate[] Methods,
     PropertyToGenerate[] Properties,
     string? XmlDoc,
-    bool IsPartial
+    bool ImplementPartial
 );
 
 internal record struct MethodToGenerate(

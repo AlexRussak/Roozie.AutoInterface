@@ -17,7 +17,7 @@ internal static class InterfaceGenerator
         sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};");
         sb.AppendLine("#nullable enable").AppendLine();
 
-        if (toGenerate.IsPartial)
+        if (toGenerate.ImplementPartial)
         {
             sb.AppendLine($"public partial class {toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
                 .AppendLine();

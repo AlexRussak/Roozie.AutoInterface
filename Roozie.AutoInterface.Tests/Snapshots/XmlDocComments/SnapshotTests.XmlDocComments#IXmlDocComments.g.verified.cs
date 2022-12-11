@@ -5,6 +5,8 @@ using System;
 namespace Roozie.AutoInterface.Tests;
 #nullable enable
 
+public partial class XmlDocComments : IXmlDocComments {}
+
 /// <summary>
 /// Test class
 /// </summary>

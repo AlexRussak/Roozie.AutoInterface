@@ -43,7 +43,7 @@ using Roozie.AutoInterface;
 
 namespace Roozie.AutoInterface.Tests;
 
-[AutoInterface(Name = "ADifferentInterfaceName")]
+[AutoInterface(Name = "ADifferentInterfaceName", ImplementOnPartial = false)]
 public partial class {{nameof(InterfaceName)}}
 {
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -118,7 +118,7 @@ namespace Roozie.AutoInterface.Tests;
 /// Test class remarks
 /// </remarks>
 [AutoInterface]
-public class {{nameof(XmlDocComments)}}
+public partial class {{nameof(XmlDocComments)}}
 {
     /// <summary>
     /// Test property
