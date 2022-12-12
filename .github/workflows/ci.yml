@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "Roozie.AutoInterface*"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "Roozie.AutoInterface*"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "7.0.x"
+
+      - run: dotnet build 'Roozie.AutoInterface.sln' -c Release
+
+      - run: dotnet test 'Roozie.AutoInterface.sln' -c Release --no-build
