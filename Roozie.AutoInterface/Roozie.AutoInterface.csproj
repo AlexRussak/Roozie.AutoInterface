@@ -4,6 +4,16 @@
     <LangVersion>default</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
+    <Version>0.1.0-beta</Version>
+    <Author>Alex Russak</Author>
+    <Description>C# source generator to generate an interface for a class</Description>
+    <PackageTags>source generator;C#</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/AlexRussak/Roozie.AutoInterface</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AlexRussak/Roozie.AutoInterface</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

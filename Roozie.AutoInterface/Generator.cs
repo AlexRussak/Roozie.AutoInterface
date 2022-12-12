@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -10,7 +11,9 @@ public class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var version = typeof(Generator).Assembly.GetName().Version.ToString();
+        var version = typeof(Generator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                          ?.InformationalVersion
+                      ?? typeof(Generator).Assembly.GetName().Version.ToString();
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
             $"{AutoInterfaceAttribute.Name}.g.cs",
             SourceText.From(AutoInterfaceAttribute.Code(version), Encoding.UTF8)));

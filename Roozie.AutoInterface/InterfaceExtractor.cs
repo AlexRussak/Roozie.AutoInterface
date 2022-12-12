@@ -16,7 +16,7 @@ internal static class InterfaceExtractor
 
     public static InterfaceToGenerate? ProcessClass(INamedTypeSymbol classAttribute,
         ClassDeclarationSyntax? classDeclarationSyntax, Compilation compilation,
-        CancellationToken ct)
+        CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
 

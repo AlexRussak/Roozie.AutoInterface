@@ -42,10 +42,4 @@ an excellent resource for learning all aspects of source generators.
 
 # Examples
 
-```csharp
-
-```
-
-# TODO
-
-https://andrewlock.net/creating-a-source-generator-part-3-integration-testing-and-packaging/
+You can find examples in the test projects:
