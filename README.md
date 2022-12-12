@@ -18,6 +18,9 @@ This source generator can help you to keep your interfaces up to date with your 
 4. That's it! The interface will be automatically generated, and you set the class to implement it.
     - If you set your class as partial, the generator will automatically implement the interface.
 
+Check out the tests ([1](/Roozie.AutoInterface.Tests) [2](/Roozie.AutoInterface.Tests.Integration)) if you need some
+examples.
+
 ## Configuration
 
 You can configure the generator in the `[AutoInterface]` attribute. The following options are available:
@@ -28,7 +31,6 @@ You can configure the generator in the `[AutoInterface]` attribute. The followin
 | IncludeMethods     | `true`           | Set to `false` to not automatically include methods in the interface. You can mark a method as included by adding the `[AddToInterface]` to it. |
 | IncludeProperties  | `true`           | Same as IncludeMethods                                                                                                                          |
 | ImplementOnPartial | `true`           | When true, the interface will be automatically implemented if the class is marked as partial.                                                   |
-|                    |
 
 # Contributing
 
@@ -39,7 +41,3 @@ request.
 
 Shout out to Andrew Lock's [Source Generator series](https://andrewlock.net/series/creating-a-source-generator/). It was
 an excellent resource for learning all aspects of source generators.
-
-# Examples
-
-You can find examples in the test projects:
