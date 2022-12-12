@@ -12,7 +12,6 @@ public static class TestHelper
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
         // Create references for assemblies we require
-        // We could add multiple references if required
         IEnumerable<PortableExecutableReference> references = new[]
         {
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
@@ -24,7 +23,7 @@ public static class TestHelper
             new[] { syntaxTree },
             references);
 
-        // Create an instance of our EnumGenerator incremental source generator
+        // Create an instance of our AutoInterface incremental source generator
         var generator = new Generator();
 
         // The GeneratorDriver is used to run our generator against a compilation
@@ -33,7 +32,7 @@ public static class TestHelper
         // Run the source generator!
         driver = driver.RunGenerators(compilation);
 
-        // Use verify to snapshot test the source generator output!
+        // Use verify to snapshot test the source generator output
         return Verifier
             .Verify(driver)
             .UseDirectory(Path.Combine("Snapshots", memberName));
