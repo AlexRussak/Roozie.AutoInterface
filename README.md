@@ -1,7 +1,7 @@
 # Roozie.AutoInterface
 
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Roozie.AutoInterface)
-![Nuget](https://img.shields.io/nuget/dt/Roozie.AutoInterface)
+<a href="https://www.nuget.org/packages/Roozie.AutoInterface"><img alt="Nuget" src="https://img.shields.io/nuget/dt/Roozie.AutoInterface"></a>
+<a href="https://www.nuget.org/packages/Roozie.AutoInterface"><img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/Roozie.AutoInterface"></a>
 
 # What is it?
 
@@ -21,19 +21,19 @@ This source generator will keep your interfaces up to date.
 4. That's it! The interface will be automatically generated, and you set the class to implement it.
     - The generator will automatically implement the interface if you set your class to partial.
 
-Check out the tests ([1](/Roozie.AutoInterface.Tests), [2](/Roozie.AutoInterface.Tests.Integration)) if you need some
-examples.
+Check out the tests ([1](/Roozie.AutoInterface.Tests), [2](/Roozie.AutoInterface.Tests.Integration)) if you want to
+see examples.
 
 ## Configuration
 
 You can configure the generator in the `[AutoInterface]` attribute. The following options are available:
 
-| Option             | Default Value    | Description                                                                                                                                     |
-|--------------------|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| Name               | "I" + Class name | Set the interface to whatever name you want.                                                                                                    |
+| Option             | Default Value    | Description                                                                                                                                                      |
+|--------------------|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name               | "I" + Class name | Set the interface to whatever name you want.                                                                                                                     |
 | IncludeMethods     | `true`           | Set to `false`, the generator will automatically include methods in the interface. You can mark a method as included by adding the `[AddToInterface]` attribute. |
-| IncludeProperties  | `true`           | Same as IncludeMethods                                                                                                                          |
-| ImplementOnPartial | `true`           | When true, the interface will be automatically implemented if the class is marked as partial.                                                   |
+| IncludeProperties  | `true`           | Same as IncludeMethods                                                                                                                                           |
+| ImplementOnPartial | `true`           | When true, the interface will be automatically implemented if the class is marked as partial.                                                                    |
 
 # Contributing
 
