@@ -5,13 +5,13 @@ on:
     branches:
       - "main"
     paths:
-      - "Roozie.AutoInterface*"
+      - "Roozie.AutoInterface**"
       - ".github/workflows/ci.yml"
   pull_request:
     branches:
       - "main"
     paths:
-      - "Roozie.AutoInterface*"
+      - "Roozie.AutoInterface**"
       - ".github/workflows/ci.yml"
   workflow_dispatch:
 
