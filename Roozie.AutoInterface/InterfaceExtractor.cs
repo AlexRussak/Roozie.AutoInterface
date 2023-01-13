@@ -50,6 +50,53 @@ internal static class InterfaceExtractor
             return null;
         }
 
+        // Process the class and it's inheritance chain
+        var methods = new HashSet<MethodToGenerate>();
+        var properties = new HashSet<PropertyToGenerate>();
+        var classToProcess = classSymbol;
+        while (classToProcess != null)
+        {
+            if (string.Equals(classToProcess.Name, "Object", StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            var (classMethods, classProperties) =
+                ProcessClass(classToProcess, settings.Value, ct);
+            methods.UnionWith(classMethods);
+            properties.UnionWith(classProperties);
+
+            classToProcess = classToProcess.BaseType;
+        }
+
+        var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
+        var usings = root.Usings
+            .Select(u => u.Name.ToString())
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .OrderBy(u => u)
+            .ToImmutableArray();
+
+        var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
+
+        var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
+                               settings.Value.ImplementOnPartial;
+        return new(
+            classSymbol.Name,
+            settings.Value.InterfaceName ?? "I" + classSymbol.Name,
+            classSymbol.ContainingNamespace.IsGlobalNamespace
+                ? string.Empty
+                : classSymbol.ContainingNamespace.ToString(),
+            usings,
+            methods.ToArray(),
+            properties.ToArray(),
+            classDoc,
+            implementPartial
+        );
+    }
+
+    private static (IReadOnlyCollection<MethodToGenerate> methods, IReadOnlyCollection<PropertyToGenerate> properties)
+        ProcessClass(INamedTypeSymbol classSymbol, GeneratorSettings settings, CancellationToken cancellationToken)
+    {
         var methods = new List<MethodToGenerate>();
         var properties = new List<PropertyToGenerate>();
         foreach (var member in classSymbol.GetMembers())
@@ -81,42 +128,20 @@ internal static class InterfaceExtractor
                 case IMethodSymbol method
                     when ObjectMethods.Contains(method.Name, StringComparer.Ordinal) && method.IsOverride:
                     continue;
-                case IMethodSymbol when !settings.Value.IncludeMethods && !memberContainsAttribute:
+                case IMethodSymbol when !settings.IncludeMethods && !memberContainsAttribute:
                     continue;
                 case IMethodSymbol method:
-                    methods.Add(ConvertMethod(method, ct));
+                    methods.Add(ConvertMethod(method, cancellationToken));
                     break;
-                case IPropertySymbol when !settings.Value.IncludeProperties && !memberContainsAttribute:
+                case IPropertySymbol when !settings.IncludeProperties && !memberContainsAttribute:
                     continue;
                 case IPropertySymbol propertySymbol:
-                    properties.Add(ConvertProperty(propertySymbol, ct));
+                    properties.Add(ConvertProperty(propertySymbol, cancellationToken));
                     break;
             }
         }
 
-        var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
-        var usings = root.Usings
-            .Select(u => u.Name.ToString())
-            .Where(u => !string.IsNullOrWhiteSpace(u))
-            .OrderBy(u => u)
-            .ToImmutableArray();
-
-        var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
-
-        var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
-                               settings.Value.ImplementOnPartial;
-        return new(
-            classSymbol.Name,
-            settings.Value.InterfaceName ?? "I" + classSymbol.Name,
-            classSymbol.ContainingNamespace.IsGlobalNamespace
-                ? string.Empty
-                : classSymbol.ContainingNamespace.ToString(),
-            usings,
-            methods.ToArray(),
-            properties.ToArray(),
-            classDoc,
-            implementPartial
-        );
+        return (methods, properties);
     }
 
     private static GeneratorSettings GetSettings(AttributeData attributeData)

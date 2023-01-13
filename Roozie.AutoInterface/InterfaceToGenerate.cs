@@ -1,6 +1,6 @@
 namespace Roozie.AutoInterface;
 
-internal record struct InterfaceToGenerate(
+internal readonly record struct InterfaceToGenerate(
     string ClassName,
     string InterfaceName,
     string Namespace,
@@ -11,25 +11,65 @@ internal record struct InterfaceToGenerate(
     bool ImplementPartial
 );
 
-internal record struct MethodToGenerate(
+internal readonly record struct MethodToGenerate(
     string Name,
     string ReturnType,
     ParameterToGenerate[] Parameters,
     string? XmlDoc
-);
+)
+{
+    public bool Equals(MethodToGenerate other)
+    {
+        // Compare the name and the parameter types
+        if (!string.Equals(Name, other.Name, StringComparison.Ordinal) ||
+            Parameters.Length != other.Parameters.Length)
+        {
+            return false;
+        }
 
-internal record struct ParameterToGenerate(
+        for (var i = 0; i < Parameters.Length; i++)
+        {
+            if (!string.Equals(Parameters[i].Type, other.Parameters[i].Type, StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = StringComparer.Ordinal.GetHashCode(Name);
+            for (var i = 0; i < Parameters.Length; i++)
+            {
+                hashCode = (hashCode * 397) ^ StringComparer.Ordinal.GetHashCode(Parameters[i].Type);
+            }
+
+            return hashCode;
+        }
+    }
+}
+
+internal readonly record struct ParameterToGenerate(
     string Name,
     string Type
 );
 
-internal record struct PropertyToGenerate(
+internal readonly record struct PropertyToGenerate(
     string Name,
     string Type,
     bool HasGetter,
     SetPropertyType? SetType,
     string? XmlDoc
-);
+)
+{
+    public bool Equals(PropertyToGenerate other) => string.Equals(Name, other.Name, StringComparison.Ordinal);
+
+    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Name);
+}
 
 public enum SetPropertyType
 {

@@ -141,4 +141,31 @@ public partial class {{nameof(XmlDocComments)}}
 """;
         return TestHelper.Verify(source);
     }
+
+    [Fact]
+    public Task ClassInheritance()
+    {
+        const string source = $$"""
+using System;
+using Roozie.AutoInterface;
+using System.Text;
+
+namespace Roozie.AutoInterface.Tests;
+
+public abstract class {{nameof(ClassInheritance)}}Base
+{
+    public virtual string? TestString { get; set; }
+    public virtual string? TestMethod() => TestString;
+}
+
+[AutoInterface]
+public class {{nameof(ClassInheritance)}} : {{nameof(ClassInheritance)}}Base
+{
+    public Guid? Property { get; set; }
+    public string TestMethod2(string input) => input;
+    public new string? TestMethod() => "test";
+}
+""";
+        return TestHelper.Verify(source);
+    }
 }
