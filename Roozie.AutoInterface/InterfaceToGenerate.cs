@@ -1,5 +1,8 @@
 namespace Roozie.AutoInterface;
 
+// File name must match type name
+#pragma warning disable MA0048
+
 internal record struct InterfaceToGenerate(
     string ClassName,
     string InterfaceName,
