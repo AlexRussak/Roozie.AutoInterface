@@ -867,9 +867,6 @@ dotnet_diagnostic.MA0026.severity = suggestion
 # MA0040: Forward the CancellationToken parameter to methods that take one
 dotnet_diagnostic.MA0040.severity = error
 
-# MA0048: File name must match type name
-dotnet_diagnostic.MA0048.severity = none
-
 # MA0051: Method is too long
 dotnet_diagnostic.MA0051.severity = suggestion
 MA0051.maximum_lines_per_method = 100
