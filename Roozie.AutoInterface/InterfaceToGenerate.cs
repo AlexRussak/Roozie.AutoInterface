@@ -3,7 +3,7 @@ namespace Roozie.AutoInterface;
 // File name must match type name
 #pragma warning disable MA0048
 
-internal record struct InterfaceToGenerate(
+internal readonly record struct InterfaceToGenerate(
     string ClassName,
     string InterfaceName,
     string Namespace,
@@ -14,19 +14,19 @@ internal record struct InterfaceToGenerate(
     bool ImplementPartial
 );
 
-internal record struct MethodToGenerate(
+internal readonly record struct MethodToGenerate(
     string Name,
     string ReturnType,
     ParameterToGenerate[] Parameters,
     string? XmlDoc
 );
 
-internal record struct ParameterToGenerate(
+internal readonly record struct ParameterToGenerate(
     string Name,
     string Type
 );
 
-internal record struct PropertyToGenerate(
+internal readonly record struct PropertyToGenerate(
     string Name,
     string Type,
     bool HasGetter,
@@ -34,7 +34,7 @@ internal record struct PropertyToGenerate(
     string? XmlDoc
 );
 
-public enum SetPropertyType
+internal enum SetPropertyType
 {
     Set,
     Init
