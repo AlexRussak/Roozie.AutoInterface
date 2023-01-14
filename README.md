@@ -16,13 +16,30 @@ This source generator will keep your interfaces up to date.
 # How to use it?
 
 1. Add the NuGet package to your project.
-2. Add the `[AutoInterface]` attribute to the class you want to generate an interface.
-3. Build your project.
-4. That's it! The interface will be automatically generated, and you set the class to implement it.
-   - The generator will automatically implement the interface if you set your class to partial.
 
-Check out the tests ([1](/Roozie.AutoInterface.Tests), [2](/Roozie.AutoInterface.Tests.Integration)) if you want to
-see examples.
+   `dotnet add package Roozie.AutoInterface --prerelease`
+
+2. Create a class where you want to generate an interface.
+
+```csharp
+public class MyClass
+{
+    public string MyProperty { get; set; }
+
+    public void MyMethod()
+    {
+        // Do something
+    }
+}
+```
+
+3. Add the `[AutoInterface]` attribute to the class.
+4. An interface will be generated in the same namespace as the class.
+
+You can now use the generated interface in your code.
+If the class is `partial`, the interface will be automatically implemented.
+
+Check out the tests ([1](/Roozie.AutoInterface.Tests), [2](/Roozie.AutoInterface.Tests.Integration)) for examples.
 
 ## Configuration
 
@@ -42,5 +59,4 @@ request.
 
 # Kudos
 
-Shout out to Andrew Lock's [Source Generator series](https://andrewlock.net/series/creating-a-source-generator/). It was
-an excellent resource for learning all aspects of source generators.
+Andrew Lock's [Source Generator series](https://andrewlock.net/series/creating-a-source-generator/) is an excellent resource for learning all aspects of source generators.
