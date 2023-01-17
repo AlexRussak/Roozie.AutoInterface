@@ -1,19 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>default</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
-    <Version>0.1.1-beta</Version>
-    <Authors>Alex Russak</Authors>
-    <Description>C# source generator to generate an interface for a class</Description>
-    <PackageTags>source generator;C#</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/AlexRussak/Roozie.AutoInterface</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/AlexRussak/Roozie.AutoInterface</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,8 +10,14 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all"/>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" PrivateAssets="all"/>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Roozie.AutoInterface.Attributes\Roozie.AutoInterface.Attributes.csproj" PrivateAssets="all"/>
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Include="$(OutputPath)\Roozie.AutoInterface.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Include="$(OutputPath)\Roozie.AutoInterface.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true"/>
+    <None Include="$(OutputPath)\Roozie.AutoInterface.Attributes.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true"/>
   </ItemGroup>
 </Project>

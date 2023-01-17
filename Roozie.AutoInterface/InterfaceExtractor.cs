@@ -68,7 +68,8 @@ internal static class InterfaceExtractor
             {
                 var memberAttrs = member.GetAttributes();
                 if (memberAttrs.Any(a =>
-                        string.Equals(a.AttributeClass?.Name, AddToInterfaceAttribute.Name, StringComparison.Ordinal)))
+                        string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
+                            StringComparison.Ordinal)))
                 {
                     memberContainsAttribute = true;
                 }
@@ -128,27 +129,30 @@ internal static class InterfaceExtractor
 
         foreach (var kvp in attributeData.NamedArguments)
         {
-            if (string.Equals(kvp.Key, "Name", StringComparison.Ordinal)
-                && kvp.Value.Value?.ToString() is { } s
+            var key = kvp.Key;
+            var value = kvp.Value;
+
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.Name), StringComparison.Ordinal)
+                && value.Value?.ToString() is { } s
                 && !string.IsNullOrWhiteSpace(s))
             {
                 interfaceName = s;
             }
 
-            if (string.Equals(kvp.Key, "IncludeMethods", StringComparison.Ordinal)
-                && kvp.Value.Value is bool methodsFlag)
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.IncludeMethods), StringComparison.Ordinal)
+                && value.Value is bool methodsFlag)
             {
                 includeMethods = methodsFlag;
             }
 
-            if (string.Equals(kvp.Key, "IncludeProperties", StringComparison.Ordinal)
-                && kvp.Value.Value is bool propertiesFlag)
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.IncludeProperties), StringComparison.Ordinal)
+                && value.Value is bool propertiesFlag)
             {
                 includeProperties = propertiesFlag;
             }
 
-            if (string.Equals(kvp.Key, "ImplementOnPartial", StringComparison.Ordinal)
-                && kvp.Value.Value is bool partialFlag)
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.ImplementOnPartial), StringComparison.Ordinal)
+                && value.Value is bool partialFlag)
             {
                 implementOnPartial = partialFlag;
             }
@@ -157,12 +161,16 @@ internal static class InterfaceExtractor
         return new(interfaceName, includeMethods ?? true, includeProperties ?? true, implementOnPartial ?? true);
     }
 
-    private static MethodToGenerate ConvertMethod(IMethodSymbol method, CancellationToken ct) =>
-        new(method.Name, method.ReturnType.ToDisplayString(),
-            method.Parameters.Select(parameter =>
-                    new ParameterToGenerate(parameter.Name, parameter.Type.ToDisplayString()))
-                .ToArray(),
+    private static MethodToGenerate ConvertMethod(IMethodSymbol method, CancellationToken ct)
+    {
+        var parameters = method.Parameters.Select(parameter =>
+                new ParameterToGenerate(parameter.Name, parameter.Type.ToDisplayString()))
+            .ToArray();
+
+        return new(method.Name, method.ReturnType.ToDisplayString(),
+            parameters,
             method.GetDocumentationCommentXml(cancellationToken: ct));
+    }
 
     private static PropertyToGenerate ConvertProperty(IPropertySymbol property, CancellationToken ct)
     {

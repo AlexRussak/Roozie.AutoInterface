@@ -83,8 +83,8 @@ namespace Roozie.AutoInterface.Tests;
 [AutoInterface(IncludeMethods = false, IncludeProperties = false)]
 public class {{nameof(AddToInterface_Attribute)}}
 {
-    public string? Test { get; private set; }
-    public int TestMethod(int input) => input;
+    public string? TestPropWithoutAttribute { get; private set; }
+    public int TestMethodWithoutAttribute(int input) => input;
 
     [AddToInterface]
     public string? TestPropWithAttribute { get; set; }

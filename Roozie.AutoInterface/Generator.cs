@@ -11,16 +11,9 @@ public class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var version = typeof(Generator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                          ?.InformationalVersion
-                      ?? typeof(Generator).Assembly.GetName().Version.ToString();
-        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-            $"{AutoInterfaceAttribute.Name}.g.cs",
-            SourceText.From(AutoInterfaceAttribute.Code(version), Encoding.UTF8)));
-
-        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-            $"{AddToInterfaceAttribute.Name}.g.cs",
-            SourceText.From(AddToInterfaceAttribute.Code(version), Encoding.UTF8)));
+        var assembly = typeof(Generator).Assembly;
+        var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                      ?? assembly.GetName().Version.ToString();
 
         var classDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -45,7 +38,7 @@ public class Generator : IIncrementalGenerator
             return;
         }
 
-        // Convert each to an interface to generate
+        // Convert each class to an interface to generate
         var interfacesToGenerate = GetTypesToGenerate(compilation, classes.Distinct(),
             context.CancellationToken);
 
@@ -60,20 +53,23 @@ public class Generator : IIncrementalGenerator
         IEnumerable<ClassDeclarationSyntax?> classes, CancellationToken ct)
     {
         // Check for the attribute
-        var classAttribute = compilation.GetTypeByMetadataName(AutoInterfaceAttribute.FullName);
-        if (classAttribute != null)
+        var classAttribute = compilation.GetTypeByMetadataName(Shared.FullNames.AutoInterfaceAttribute);
+        if (classAttribute == null)
         {
-            foreach (var classDeclarationSyntax in classes)
+            yield break;
+        }
+
+        foreach (var classDeclarationSyntax in classes)
+        {
+            var result = InterfaceExtractor.ProcessClass(classAttribute, classDeclarationSyntax, compilation, ct);
+            if (result != null)
             {
-                var result = InterfaceExtractor.ProcessClass(classAttribute, classDeclarationSyntax, compilation, ct);
-                if (result != null)
-                {
-                    yield return result.Value;
-                }
+                yield return result.Value;
             }
         }
     }
 
+    // Only process nodes that are classes with at least one attribute
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node) =>
         node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
 
@@ -94,7 +90,7 @@ public class Generator : IIncrementalGenerator
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
 
                 // Is the attribute the [AutoInterface] attribute?
-                if (string.Equals(fullName, AutoInterfaceAttribute.FullName, StringComparison.Ordinal))
+                if (string.Equals(fullName, Shared.FullNames.AutoInterfaceAttribute, StringComparison.Ordinal))
                 {
                     return classDeclarationSyntax;
                 }
