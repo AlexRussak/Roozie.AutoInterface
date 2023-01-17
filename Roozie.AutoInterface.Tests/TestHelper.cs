@@ -12,14 +12,18 @@ public static class TestHelper
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
         // Create references for assemblies we require
-        IEnumerable<PortableExecutableReference> references = new[]
-        {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
-        };
+        var references = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+            .Select(a => MetadataReference.CreateFromFile(a.Location))
+            .Concat(new[]
+            {
+                MetadataReference.CreateFromFile(typeof(Generator).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(AutoInterfaceAttribute).Assembly.Location),
+            });
 
         // Create a Roslyn compilation for the syntax tree
         var compilation = CSharpCompilation.Create(
-            "Tests",
+            "generator",
             new[] { syntaxTree },
             references);
 

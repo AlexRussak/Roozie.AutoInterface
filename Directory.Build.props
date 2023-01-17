@@ -1,5 +1,22 @@
 <Project>
   <PropertyGroup>
+    <VersionPrefix>0.2.0</VersionPrefix>
+    <VersionSuffix>beta</VersionSuffix>
+    <PackageVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</PackageVersion>
+    <PackageVersion Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+    <Authors>Alex Russak</Authors>
+    <Description>C# source generator to automatically create an interface from a class</Description>
+    <PackageTags>source generator;C#</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/AlexRussak/Roozie.AutoInterface</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AlexRussak/Roozie.AutoInterface</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)\artifacts</PackageOutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>default</LangVersion>
     <ImplicitUsings>true</ImplicitUsings>
     <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn)</NoWarn>
@@ -15,6 +32,9 @@
   <ItemGroup>
     <Using Include="System.Globalization"/>
     <Using Include="System.Text"/>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.7">

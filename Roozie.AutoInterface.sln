@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Config", "_Config", "{FA5A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roozie.AutoInterface.Tests.Integration", "Roozie.AutoInterface.Tests.Integration\Roozie.AutoInterface.Tests.Integration.csproj", "{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roozie.AutoInterface.Attributes", "Roozie.AutoInterface.Attributes\Roozie.AutoInterface.Attributes.csproj", "{D751D181-205D-4D79-95BF-0DE21C05364A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C63F3BFF-0A62-4AA6-9B85-BBD5469BD8EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D751D181-205D-4D79-95BF-0DE21C05364A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D751D181-205D-4D79-95BF-0DE21C05364A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D751D181-205D-4D79-95BF-0DE21C05364A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D751D181-205D-4D79-95BF-0DE21C05364A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
