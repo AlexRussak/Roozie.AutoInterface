@@ -77,7 +77,9 @@ internal static class InterfaceGenerator
             return;
         }
 
+#pragma warning disable RS1035 // Need to use Environment.NewLine
         var split = xmlDoc!.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+#pragma warning restore RS1035
         foreach (var s in split)
         {
             // The xml docs are wrapped in <member> tags, so we need to remove them
