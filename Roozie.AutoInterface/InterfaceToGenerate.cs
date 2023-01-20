@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+
 namespace Roozie.AutoInterface;
 
 // File name must match type name
@@ -11,7 +13,9 @@ internal readonly record struct InterfaceToGenerate(
     MethodToGenerate[] Methods,
     PropertyToGenerate[] Properties,
     string? XmlDoc,
-    bool ImplementPartial
+    bool ImplementPartial,
+    Location Location,
+    ErrorType? ErrorType = null
 );
 
 internal readonly record struct MethodToGenerate(
@@ -38,4 +42,9 @@ internal enum SetPropertyType
 {
     Set,
     Init
+}
+
+internal enum ErrorType
+{
+    StaticClass
 }

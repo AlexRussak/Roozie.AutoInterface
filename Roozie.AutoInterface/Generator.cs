@@ -36,7 +36,23 @@ public class Generator : IIncrementalGenerator
     private static void Execute(InterfaceToGenerate interfaceToGenerate, SourceProductionContext context,
         string version)
     {
+        if (interfaceToGenerate.ErrorType != null)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(interfaceToGenerate, interfaceToGenerate.ErrorType.Value));
+            return;
+        }
+
         var (interfaceName, source) = InterfaceGenerator.Generate(interfaceToGenerate, version);
         context.AddSource($"{interfaceName}.g.cs", SourceText.From(source, Encoding.UTF8));
     }
+
+    private static Diagnostic CreateDiagnostic(InterfaceToGenerate interfaceToGenerate, ErrorType type) =>
+        type switch
+        {
+            ErrorType.StaticClass => Diagnostic.Create(new("RZAI001", "Static classes are not supported",
+                    "'{0}' is a static class and cannot be used with AutoInterface",
+                    Shared.Namespace, DiagnosticSeverity.Error, true), interfaceToGenerate.Location,
+                interfaceToGenerate.ClassName),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
 }

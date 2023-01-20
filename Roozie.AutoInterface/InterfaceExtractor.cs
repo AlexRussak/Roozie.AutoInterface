@@ -99,7 +99,9 @@ internal static class InterfaceExtractor
             methods.ToArray(),
             properties.ToArray(),
             classDoc,
-            implementPartial
+            implementPartial,
+            classDeclarationSyntax.GetLocation(),
+            classSymbol.IsStatic ? ErrorType.StaticClass : null
         );
     }
 
