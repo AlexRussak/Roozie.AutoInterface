@@ -42,30 +42,15 @@ internal static class InterfaceExtractor
                 continue;
             }
 
-            var memberContainsAttribute = false;
-            var memberAttrs = member.GetAttributes();
-            if (memberAttrs.Any(a =>
-                    string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
-                        StringComparison.Ordinal)))
+            var (method, property) = ConvertMember(member, settings, ct);
+            if (method != null)
             {
-                memberContainsAttribute = true;
+                methods.Add(method.Value);
             }
 
-            if (member is IMethodSymbol methodSymbol &&
-                (memberContainsAttribute || settings.IncludeMethods))
+            if (property != null)
             {
-                if (ObjectMethods.Contains(methodSymbol.Name, StringComparer.Ordinal) ||
-                    methodSymbol.MethodKind != MethodKind.Ordinary)
-                {
-                    continue;
-                }
-
-                methods.Add(ConvertMethod(methodSymbol, ct));
-            }
-            else if (member is IPropertySymbol propertySymbol &&
-                     (memberContainsAttribute || settings.IncludeProperties))
-            {
-                properties.Add(ConvertProperty(propertySymbol, ct));
+                properties.Add(property.Value);
             }
         }
 
@@ -94,6 +79,39 @@ internal static class InterfaceExtractor
             classDeclarationSyntax.GetLocation(),
             classSymbol.IsStatic ? ErrorType.StaticClass : null
         );
+    }
+
+    private static (MethodToGenerate? method, PropertyToGenerate? property) ConvertMember(ISymbol member,
+        GeneratorSettings settings, CancellationToken ct)
+    {
+        var memberContainsAttribute = false;
+        var memberAttrs = member.GetAttributes();
+        if (memberAttrs.Any(a =>
+                string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
+                    StringComparison.Ordinal)))
+        {
+            memberContainsAttribute = true;
+        }
+
+        if (member is IMethodSymbol methodSymbol &&
+            (memberContainsAttribute || settings.IncludeMethods))
+        {
+            if (ObjectMethods.Contains(methodSymbol.Name, StringComparer.Ordinal) ||
+                methodSymbol.MethodKind != MethodKind.Ordinary)
+            {
+                return (null, null);
+            }
+
+            return (ConvertMethod(methodSymbol, ct), null);
+        }
+
+        if (member is IPropertySymbol propertySymbol &&
+            (memberContainsAttribute || settings.IncludeProperties))
+        {
+            return (null, ConvertProperty(propertySymbol, ct));
+        }
+
+        return (null, null);
     }
 
     private static GeneratorSettings GetSettings(AttributeData attributeData)

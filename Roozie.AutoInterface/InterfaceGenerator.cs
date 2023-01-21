@@ -2,10 +2,10 @@ namespace Roozie.AutoInterface;
 
 internal static class InterfaceGenerator
 {
+    private const string Spacer = "    ";
+
     public static (string interfaceName, string sourceCode) Generate(InterfaceToGenerate toGenerate, string version)
     {
-        const string spacer = "    ";
-
         var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
         sb.AppendLine();
 
@@ -29,51 +29,19 @@ internal static class InterfaceGenerator
 
         foreach (var property in toGenerate.Properties)
         {
-            if (property is { HasGetter: false, SetType: null })
+            var propCode = GenerateProperty(property);
+            if (propCode == null)
             {
                 continue;
             }
 
-            var getString = property.HasGetter ? "get;" : string.Empty;
-            var setString = property.SetType switch
-            {
-                SetPropertyType.Set => "set;",
-                SetPropertyType.Init => "init;",
-                _ => string.Empty
-            };
-
-            AddXmlDoc(sb, property.XmlDoc, spacer);
-            sb.Append($"{spacer}{property.Type} {property.Name}");
-            if (property.Parameters.Length > 0)
-            {
-                sb.Append('[');
-                foreach (var parameter in property.Parameters)
-                {
-                    sb.Append($"{parameter.Type} {parameter.Name}, ");
-                }
-
-                sb.Length -= 2;
-                sb.Append(']');
-            }
-
-            sb.AppendLine($" {{{getString}{setString}}}").AppendLine();
+            sb.Append(propCode);
         }
 
         foreach (var method in toGenerate.Methods)
         {
-            AddXmlDoc(sb, method.XmlDoc, spacer);
-            sb.Append($"{spacer}{method.ReturnType} {method.Name}(");
-            if (method.Parameters.Length > 0)
-            {
-                foreach (var (parameterName, parameterType) in method.Parameters)
-                {
-                    sb.Append(parameterType).Append(' ').Append(parameterName).Append(", ");
-                }
-
-                sb.Length -= 2;
-            }
-
-            sb.AppendLine(");").AppendLine();
+            var methodCode = GenerateMethod(method);
+            sb.Append(methodCode);
         }
 
         // Close interface
@@ -81,6 +49,59 @@ internal static class InterfaceGenerator
         sb.AppendLine("}");
 
         return (toGenerate.InterfaceName, sb.ToString());
+    }
+
+    private static string? GenerateProperty(PropertyToGenerate property)
+    {
+        if (property is { HasGetter: false, SetType: null })
+        {
+            return null;
+        }
+
+        var sb = new StringBuilder();
+        var getString = property.HasGetter ? "get;" : string.Empty;
+        var setString = property.SetType switch
+        {
+            SetPropertyType.Set => "set;",
+            SetPropertyType.Init => "init;",
+            _ => string.Empty
+        };
+
+        AddXmlDoc(sb, property.XmlDoc, Spacer);
+        sb.Append($"{Spacer}{property.Type} {property.Name}");
+        if (property.Parameters.Length > 0)
+        {
+            sb.Append('[');
+            foreach (var parameter in property.Parameters)
+            {
+                sb.Append($"{parameter.Type} {parameter.Name}, ");
+            }
+
+            sb.Length -= 2;
+            sb.Append(']');
+        }
+
+        sb.AppendLine($" {{{getString}{setString}}}").AppendLine();
+        return sb.ToString();
+    }
+
+    private static string GenerateMethod(MethodToGenerate method)
+    {
+        var sb = new StringBuilder();
+        AddXmlDoc(sb, method.XmlDoc, Spacer);
+        sb.Append($"{Spacer}{method.ReturnType} {method.Name}(");
+        if (method.Parameters.Length > 0)
+        {
+            foreach (var (parameterName, parameterType) in method.Parameters)
+            {
+                sb.Append(parameterType).Append(' ').Append(parameterName).Append(", ");
+            }
+
+            sb.Length -= 2;
+        }
+
+        sb.AppendLine(");").AppendLine();
+        return sb.ToString();
     }
 
     private static void AddXmlDoc(StringBuilder sb, string? xmlDoc, string? indent)
