@@ -33,6 +33,7 @@ internal readonly record struct ParameterToGenerate(
 internal readonly record struct PropertyToGenerate(
     string Name,
     string Type,
+    ParameterToGenerate[] Parameters,
     bool HasGetter,
     SetPropertyType? SetType,
     string? XmlDoc

@@ -43,7 +43,20 @@ internal static class InterfaceGenerator
             };
 
             AddXmlDoc(sb, property.XmlDoc, spacer);
-            sb.AppendLine($"{spacer}{property.Type} {property.Name} {{{getString}{setString}}}").AppendLine();
+            sb.Append($"{spacer}{property.Type} {property.Name}");
+            if (property.Parameters.Length > 0)
+            {
+                sb.Append('[');
+                foreach (var parameter in property.Parameters)
+                {
+                    sb.Append($"{parameter.Type} {parameter.Name}, ");
+                }
+
+                sb.Length -= 2;
+                sb.Append(']');
+            }
+
+            sb.AppendLine($" {{{getString}{setString}}}").AppendLine();
         }
 
         foreach (var method in toGenerate.Methods)

@@ -159,4 +159,37 @@ public static class {{nameof(StaticClass)}}
 """;
         return TestHelper.Verify(source);
     }
+
+    [Fact]
+    public Task Indexers()
+    {
+        const string source = $$"""
+using Roozie.AutoInterface;
+
+namespace Roozie.AutoInterface.Tests;
+
+[AutoInterface]
+public class {{nameof(Indexers)}}
+{
+    public int this[int index]
+    {
+        get { return 0; }
+        set { }
+    }
+
+    public int this[string v1]
+    {
+        get { return 0; }
+        set { }
+    }
+
+    public int this[string v1, int v2]
+    {
+        get { return 0; }
+        set { }
+    }
+}
+""";
+        return TestHelper.Verify(source);
+    }
 }
