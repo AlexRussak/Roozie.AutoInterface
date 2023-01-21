@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,88 +14,45 @@ public class Generator : IIncrementalGenerator
         var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                       ?? assembly.GetName().Version.ToString();
 
-        var classDeclarations = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                static (s, _) => IsSyntaxTargetForGeneration(s),
-                static (ctx, _) => GetSemanticTargetForGeneration(ctx))
-            .Where(static c => c is not null);
+        var interfacesToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
+                Shared.FullNames.AutoInterfaceAttribute,
+                (node, _) => node is ClassDeclarationSyntax,
+                (syntaxContext, token) => Generate(syntaxContext, token))
+            .Where(static s => s != null);
 
-        var compilationAndClasses = context.CompilationProvider.Combine(classDeclarations.Collect());
-
-        context.RegisterSourceOutput(compilationAndClasses, (spc, source) =>
-        {
-            var (compilation, classDeclarationSyntaxes) = source;
-            Execute(compilation, classDeclarationSyntaxes, spc, version);
-        });
+        context.RegisterSourceOutput(interfacesToGenerate,
+            (spc, i) => Execute(i!.Value, spc, version));
     }
 
-    private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax?> classes,
-        SourceProductionContext context, string version)
+    private static InterfaceToGenerate? Generate(GeneratorAttributeSyntaxContext context, CancellationToken token)
     {
-        if (classes.IsDefaultOrEmpty)
+        token.ThrowIfCancellationRequested();
+
+        var attribute = context.Attributes.Single();
+        return InterfaceExtractor.ProcessClass(attribute, context.TargetNode as ClassDeclarationSyntax,
+            context.SemanticModel, token);
+    }
+
+    private static void Execute(InterfaceToGenerate interfaceToGenerate, SourceProductionContext context,
+        string version)
+    {
+        if (interfaceToGenerate.ErrorType != null)
         {
+            context.ReportDiagnostic(CreateDiagnostic(interfaceToGenerate, interfaceToGenerate.ErrorType.Value));
             return;
         }
 
-        // Convert each class to an interface to generate
-        var interfacesToGenerate = GetTypesToGenerate(compilation, classes.Distinct(),
-            context.CancellationToken);
-
-        foreach (var interfaceToGenerate in interfacesToGenerate)
-        {
-            var (interfaceName, source) = InterfaceGenerator.Generate(interfaceToGenerate, version);
-            context.AddSource($"{interfaceName}.g.cs", SourceText.From(source, Encoding.UTF8));
-        }
+        var (interfaceName, source) = InterfaceGenerator.Generate(interfaceToGenerate, version);
+        context.AddSource($"{interfaceName}.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 
-    private static IEnumerable<InterfaceToGenerate> GetTypesToGenerate(Compilation compilation,
-        IEnumerable<ClassDeclarationSyntax?> classes, CancellationToken ct)
-    {
-        // Check for the attribute
-        var classAttribute = compilation.GetTypeByMetadataName(Shared.FullNames.AutoInterfaceAttribute);
-        if (classAttribute == null)
+    private static Diagnostic CreateDiagnostic(InterfaceToGenerate interfaceToGenerate, ErrorType type) =>
+        type switch
         {
-            yield break;
-        }
-
-        foreach (var classDeclarationSyntax in classes)
-        {
-            var result = InterfaceExtractor.ProcessClass(classAttribute, classDeclarationSyntax, compilation, ct);
-            if (result != null)
-            {
-                yield return result.Value;
-            }
-        }
-    }
-
-    // Only process nodes that are classes with at least one attribute
-    private static bool IsSyntaxTargetForGeneration(SyntaxNode node) =>
-        node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
-
-    private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        // loop through all the attributes on the class
-        var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
-        foreach (var attributeListSyntax in classDeclarationSyntax.AttributeLists)
-        {
-            foreach (var attributeSyntax in attributeListSyntax.Attributes)
-            {
-                if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-                {
-                    continue;
-                }
-
-                var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                var fullName = attributeContainingTypeSymbol.ToDisplayString();
-
-                // Is the attribute the [AutoInterface] attribute?
-                if (string.Equals(fullName, Shared.FullNames.AutoInterfaceAttribute, StringComparison.Ordinal))
-                {
-                    return classDeclarationSyntax;
-                }
-            }
-        }
-
-        return null;
-    }
+            ErrorType.StaticClass => Diagnostic.Create(new("RZAI001", "Static classes are not supported",
+                    "'{0}' is a static class and cannot be used with AutoInterface",
+                    Shared.Namespace, DiagnosticSeverity.Error, true), interfaceToGenerate.Location,
+                interfaceToGenerate.ClassName),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
 }

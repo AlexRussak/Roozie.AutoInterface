@@ -14,8 +14,8 @@ internal static class InterfaceExtractor
         nameof(Equals),
     }.ToImmutableArray();
 
-    public static InterfaceToGenerate? ProcessClass(INamedTypeSymbol classAttribute,
-        ClassDeclarationSyntax? classDeclarationSyntax, Compilation compilation,
+    public static InterfaceToGenerate? ProcessClass(AttributeData attributeData,
+        ClassDeclarationSyntax? classDeclarationSyntax, SemanticModel semanticModel,
         CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
@@ -25,31 +25,12 @@ internal static class InterfaceExtractor
             return null;
         }
 
-        var semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
         if (semanticModel.GetDeclaredSymbol(classDeclarationSyntax, ct) is not { } classSymbol)
         {
             return null;
         }
 
-        GeneratorSettings? settings = null;
-        var attributes = classSymbol.GetAttributes();
-        foreach (var attributeData in attributes)
-        {
-            if (!classAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
-            {
-                // This isn't the correct attribute
-                continue;
-            }
-
-            settings = GetSettings(attributeData);
-            break;
-        }
-
-        if (settings == null)
-        {
-            return null;
-        }
-
+        var settings = GetSettings(attributeData);
         var methods = new List<MethodToGenerate>();
         var properties = new List<PropertyToGenerate>();
         foreach (var member in classSymbol.GetMembers())
@@ -82,12 +63,14 @@ internal static class InterfaceExtractor
                 case IMethodSymbol method
                     when ObjectMethods.Contains(method.Name, StringComparer.Ordinal) && method.IsOverride:
                     continue;
-                case IMethodSymbol when !settings.Value.IncludeMethods && !memberContainsAttribute:
+                case IMethodSymbol when !settings.IncludeMethods && !memberContainsAttribute:
                     continue;
                 case IMethodSymbol method:
                     methods.Add(ConvertMethod(method, ct));
                     break;
-                case IPropertySymbol when !settings.Value.IncludeProperties && !memberContainsAttribute:
+                case IPropertySymbol { IsStatic: true }:
+                    continue;
+                case IPropertySymbol when !settings.IncludeProperties && !memberContainsAttribute:
                     continue;
                 case IPropertySymbol propertySymbol:
                     properties.Add(ConvertProperty(propertySymbol, ct));
@@ -105,10 +88,10 @@ internal static class InterfaceExtractor
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
 
         var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
-                               settings.Value.ImplementOnPartial;
+                               settings.ImplementOnPartial;
         return new(
             classSymbol.Name,
-            settings.Value.InterfaceName ?? "I" + classSymbol.Name,
+            settings.InterfaceName ?? "I" + classSymbol.Name,
             classSymbol.ContainingNamespace.IsGlobalNamespace
                 ? string.Empty
                 : classSymbol.ContainingNamespace.ToString(),
@@ -116,7 +99,9 @@ internal static class InterfaceExtractor
             methods.ToArray(),
             properties.ToArray(),
             classDoc,
-            implementPartial
+            implementPartial,
+            classDeclarationSyntax.GetLocation(),
+            classSymbol.IsStatic ? ErrorType.StaticClass : null
         );
     }
 
