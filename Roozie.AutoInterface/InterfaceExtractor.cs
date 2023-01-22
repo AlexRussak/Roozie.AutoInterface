@@ -35,46 +35,22 @@ internal static class InterfaceExtractor
         var properties = new List<PropertyToGenerate>();
         foreach (var member in classSymbol.GetMembers())
         {
-            if (member.DeclaredAccessibility != Accessibility.Public)
+            if (member.DeclaredAccessibility != Accessibility.Public ||
+                member.IsStatic ||
+                member.IsImplicitlyDeclared)
             {
                 continue;
             }
 
-            var memberContainsAttribute = false;
-            if (settings is { IncludeMethods: true, IncludeProperties: true })
+            var (method, property) = ConvertMember(member, settings, ct);
+            if (method != null)
             {
-                memberContainsAttribute = true;
-            }
-            else
-            {
-                var memberAttrs = member.GetAttributes();
-                if (memberAttrs.Any(a =>
-                        string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
-                            StringComparison.Ordinal)))
-                {
-                    memberContainsAttribute = true;
-                }
+                methods.Add(method.Value);
             }
 
-            switch (member)
+            if (property != null)
             {
-                case IMethodSymbol method when method.IsStatic || method.MethodKind != MethodKind.Ordinary:
-                    continue;
-                case IMethodSymbol method
-                    when ObjectMethods.Contains(method.Name, StringComparer.Ordinal) && method.IsOverride:
-                    continue;
-                case IMethodSymbol when !settings.IncludeMethods && !memberContainsAttribute:
-                    continue;
-                case IMethodSymbol method:
-                    methods.Add(ConvertMethod(method, ct));
-                    break;
-                case IPropertySymbol { IsStatic: true }:
-                    continue;
-                case IPropertySymbol when !settings.IncludeProperties && !memberContainsAttribute:
-                    continue;
-                case IPropertySymbol propertySymbol:
-                    properties.Add(ConvertProperty(propertySymbol, ct));
-                    break;
+                properties.Add(property.Value);
             }
         }
 
@@ -103,6 +79,39 @@ internal static class InterfaceExtractor
             classDeclarationSyntax.GetLocation(),
             classSymbol.IsStatic ? ErrorType.StaticClass : null
         );
+    }
+
+    private static (MethodToGenerate? method, PropertyToGenerate? property) ConvertMember(ISymbol member,
+        GeneratorSettings settings, CancellationToken ct)
+    {
+        var memberContainsAttribute = false;
+        var memberAttrs = member.GetAttributes();
+        if (memberAttrs.Any(a =>
+                string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
+                    StringComparison.Ordinal)))
+        {
+            memberContainsAttribute = true;
+        }
+
+        if (member is IMethodSymbol methodSymbol &&
+            (memberContainsAttribute || settings.IncludeMethods))
+        {
+            if (ObjectMethods.Contains(methodSymbol.Name, StringComparer.Ordinal) ||
+                methodSymbol.MethodKind != MethodKind.Ordinary)
+            {
+                return (null, null);
+            }
+
+            return (ConvertMethod(methodSymbol, ct), null);
+        }
+
+        if (member is IPropertySymbol propertySymbol &&
+            (memberContainsAttribute || settings.IncludeProperties))
+        {
+            return (null, ConvertProperty(propertySymbol, ct));
+        }
+
+        return (null, null);
     }
 
     private static GeneratorSettings GetSettings(AttributeData attributeData)
@@ -148,9 +157,7 @@ internal static class InterfaceExtractor
 
     private static MethodToGenerate ConvertMethod(IMethodSymbol method, CancellationToken ct)
     {
-        var parameters = method.Parameters.Select(parameter =>
-                new ParameterToGenerate(parameter.Name, parameter.Type.ToDisplayString()))
-            .ToArray();
+        var parameters = method.Parameters.Select(ConvertParameter).ToArray();
 
         return new(method.Name, method.ReturnType.ToDisplayString(),
             parameters,
@@ -167,7 +174,18 @@ internal static class InterfaceExtractor
             setPropertyType = property.SetMethod.IsInitOnly ? SetPropertyType.Init : SetPropertyType.Set;
         }
 
-        return new(property.Name, property.Type.ToDisplayString(), hasGetter, setPropertyType,
+        var name = property.Name;
+        if (property.IsIndexer)
+        {
+            name = name.TrimEnd('[', ']');
+        }
+
+        return new(name, property.Type.ToDisplayString(),
+            property.Parameters.Select(ConvertParameter).ToArray(),
+            hasGetter, setPropertyType,
             property.GetDocumentationCommentXml(cancellationToken: ct));
     }
+
+    private static ParameterToGenerate ConvertParameter(IParameterSymbol parameter) =>
+        new(parameter.Name, parameter.Type.ToDisplayString());
 }
