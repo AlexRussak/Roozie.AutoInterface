@@ -12,7 +12,7 @@ namespace Roozie.AutoInterface.Tests.Integration;
 /// class documentation
 /// </summary>
 [AutoInterface]
-public partial class RoozieTestClassPartial
+internal partial class RoozieTestClassPartial
 {
     /// <summary>
     /// test doc on method

@@ -6,6 +6,7 @@ namespace Roozie.AutoInterface;
 #pragma warning disable MA0048
 
 internal readonly record struct InterfaceToGenerate(
+    Accessibility Accessibility,
     string ClassName,
     string InterfaceName,
     string Namespace,
