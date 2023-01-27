@@ -1,0 +1,16 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RZAI002,
+      Title: Invalid accessibility,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (4,0)-(9,1),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: '{0}' is set to {1}. Classes must be either public or internal to be used with AutoInterface,
+      Message: 'ProtectedClass' is set to Protected. Classes must be either public or internal to be used with AutoInterface,
+      Category: Roozie.AutoInterface
+    }
+  ]
+}

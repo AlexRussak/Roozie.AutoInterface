@@ -53,6 +53,10 @@ public class Generator : IIncrementalGenerator
                     "'{0}' is a static class and cannot be used with AutoInterface",
                     Shared.Namespace, DiagnosticSeverity.Error, true), interfaceToGenerate.Location,
                 interfaceToGenerate.ClassName),
+            ErrorType.InvalidAccessibility => Diagnostic.Create(new("RZAI002", "Invalid accessibility",
+                    "'{0}' is set to {1}. Classes must be either public or internal to be used with AutoInterface",
+                    Shared.Namespace, DiagnosticSeverity.Error, true), interfaceToGenerate.Location,
+                interfaceToGenerate.ClassName, interfaceToGenerate.Accessibility),
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
 }

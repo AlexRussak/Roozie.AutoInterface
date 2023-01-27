@@ -77,7 +77,7 @@ internal static class InterfaceGenerator
             sb.Append('[');
             foreach (var parameter in property.Parameters)
             {
-                sb.Append($"{parameter.Type} {parameter.Name}, ");
+                sb.Append($"{parameter.Code}, ");
             }
 
             sb.Length -= 2;
@@ -95,9 +95,9 @@ internal static class InterfaceGenerator
         sb.Append($"{Spacer}{method.ReturnType} {method.Name}(");
         if (method.Parameters.Length > 0)
         {
-            foreach (var (parameterName, parameterType) in method.Parameters)
+            foreach (var para in method.Parameters)
             {
-                sb.Append(parameterType).Append(' ').Append(parameterName).Append(", ");
+                sb.Append(para.Code).Append(", ");
             }
 
             sb.Length -= 2;

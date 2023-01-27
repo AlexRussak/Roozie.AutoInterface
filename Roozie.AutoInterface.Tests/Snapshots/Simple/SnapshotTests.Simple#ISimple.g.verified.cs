@@ -16,5 +16,5 @@ public partial interface ISimple
 
     string? PropertyPrivateSet {get;}
 
-    string TestMethod(string input);
+    string TestMethod(string input = "test");
 }

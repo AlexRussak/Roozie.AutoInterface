@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace Roozie.AutoInterface.Tests.Integration;
 
 [AutoInterface]
@@ -18,7 +20,7 @@ public class IndexerClass : IIndexerClass
         set => _value2 = value;
     }
 
-    public int this[string v1, int v2]
+    public int this[string v1 = "", decimal v2 = 1234.1234m, KnownColor color = KnownColor.Aqua]
     {
         get => _value1;
         set => _value1 = value;

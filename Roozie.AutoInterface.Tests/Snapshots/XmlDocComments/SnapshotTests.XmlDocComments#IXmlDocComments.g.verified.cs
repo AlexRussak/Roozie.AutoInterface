@@ -34,4 +34,20 @@ public partial interface IXmlDocComments
     /// <param name="input">Test input</param>
     /// <returns>Test output</returns>
     int TestMethod(int input);
+
+    /// <summary>
+    /// test doc on method
+    /// </summary>
+    /// <param name="i">param doc</param>
+    /// <param name="b">b</param>
+    /// <param name="s">s</param>
+    /// <param name="c">c</param>
+    /// <param name="l1">l1</param>
+    /// <param name="dm">dm</param>
+    /// <param name="dd">dd</param>
+    /// <param name="f">f</param>
+    /// <param name="l2">l2</param>
+    /// <param name="ct">ct</param>
+    /// <returns>return doc</returns>
+    Task<int> DoSomethingAsync(int i = 123456, bool b = false, string s = "s", char c = 'c', long l1 = 111L, decimal dm = 1234.5m, double dd = 5678.901d, float f = 98765.04f, long l2 = long.MaxValue, CancellationToken ct = default);
 }

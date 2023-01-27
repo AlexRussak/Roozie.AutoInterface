@@ -30,19 +30,38 @@ internal static class InterfaceExtractor
             return null;
         }
 
+        if (classSymbol.IsStatic)
+        {
+            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility, classSymbol.Name,
+                classDeclarationSyntax.GetLocation(), ErrorType.StaticClass);
+        }
+
+        if (classSymbol.DeclaredAccessibility is not Accessibility.Public and not Accessibility.Internal)
+        {
+            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility, classSymbol.Name,
+                classDeclarationSyntax.GetLocation(), ErrorType.InvalidAccessibility);
+        }
+
         var settings = GetSettings(attributeData);
         var methods = new List<MethodToGenerate>();
         var properties = new List<PropertyToGenerate>();
-        foreach (var member in classSymbol.GetMembers())
+        foreach (var memberSyntax in classDeclarationSyntax.Members)
         {
-            if (member.DeclaredAccessibility != Accessibility.Public ||
-                member.IsStatic ||
-                member.IsImplicitlyDeclared)
+            if (memberSyntax.Modifiers.Any(SyntaxKind.StaticKeyword) ||
+                memberSyntax.Modifiers.Any(SyntaxKind.PrivateKeyword) ||
+                memberSyntax.Modifiers.Any(SyntaxKind.ProtectedKeyword) ||
+                memberSyntax.Modifiers.Any(SyntaxKind.InternalKeyword))
             {
                 continue;
             }
 
-            var (method, property) = ConvertMember(member, settings, ct);
+            var memberSymbol = semanticModel.GetDeclaredSymbol(memberSyntax, ct);
+            if (memberSymbol == null)
+            {
+                continue;
+            }
+
+            var (method, property) = ConvertMember(memberSyntax, memberSymbol, settings, ct);
             if (method != null)
             {
                 methods.Add(method.Value);
@@ -77,16 +96,14 @@ internal static class InterfaceExtractor
             properties.ToArray(),
             classDoc,
             implementPartial,
-            classDeclarationSyntax.GetLocation(),
-            classSymbol.IsStatic ? ErrorType.StaticClass : null
-        );
+            classDeclarationSyntax.GetLocation());
     }
 
-    private static (MethodToGenerate? method, PropertyToGenerate? property) ConvertMember(ISymbol member,
-        GeneratorSettings settings, CancellationToken ct)
+    private static (MethodToGenerate? method, PropertyToGenerate? property) ConvertMember(
+        MemberDeclarationSyntax memberSyntax, ISymbol symbol, GeneratorSettings settings, CancellationToken ct)
     {
         var memberContainsAttribute = false;
-        var memberAttrs = member.GetAttributes();
+        var memberAttrs = symbol.GetAttributes();
         if (memberAttrs.Any(a =>
                 string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
                     StringComparison.Ordinal)))
@@ -94,7 +111,7 @@ internal static class InterfaceExtractor
             memberContainsAttribute = true;
         }
 
-        if (member is IMethodSymbol methodSymbol &&
+        if (symbol is IMethodSymbol methodSymbol &&
             (memberContainsAttribute || settings.IncludeMethods))
         {
             if (ObjectMethods.Contains(methodSymbol.Name, StringComparer.Ordinal) ||
@@ -103,13 +120,15 @@ internal static class InterfaceExtractor
                 return (null, null);
             }
 
-            return (ConvertMethod(methodSymbol, ct), null);
+            var methodSyntax = (MethodDeclarationSyntax)memberSyntax;
+            return (ConvertMethod(methodSymbol, methodSyntax, ct), null);
         }
 
-        if (member is IPropertySymbol propertySymbol &&
+        if (symbol is IPropertySymbol propertySymbol &&
             (memberContainsAttribute || settings.IncludeProperties))
         {
-            return (null, ConvertProperty(propertySymbol, ct));
+            var indexerSyntax = memberSyntax as IndexerDeclarationSyntax;
+            return (null, ConvertProperty(propertySymbol, indexerSyntax, ct));
         }
 
         return (null, null);
@@ -156,37 +175,51 @@ internal static class InterfaceExtractor
         return new(interfaceName, includeMethods ?? true, includeProperties ?? true, implementOnPartial ?? true);
     }
 
-    private static MethodToGenerate ConvertMethod(IMethodSymbol method, CancellationToken ct)
+    private static MethodToGenerate ConvertMethod(IMethodSymbol symbol, BaseMethodDeclarationSyntax syntax,
+        CancellationToken ct)
     {
-        var parameters = method.Parameters.Select(ConvertParameter).ToArray();
+        var parameters = syntax.ParameterList.Parameters
+            .Select(ConvertParameter)
+            .ToArray();
 
-        return new(method.Name, method.ReturnType.ToDisplayString(),
+        return new(symbol.Name, symbol.ReturnType.ToDisplayString(),
             parameters,
-            method.GetDocumentationCommentXml(cancellationToken: ct));
+            symbol.GetDocumentationCommentXml(cancellationToken: ct));
     }
 
-    private static PropertyToGenerate ConvertProperty(IPropertySymbol property, CancellationToken ct)
+    private static PropertyToGenerate ConvertProperty(IPropertySymbol symbol, IndexerDeclarationSyntax? indexerSyntax,
+        CancellationToken ct)
     {
-        var hasGetter = property.GetMethod is { DeclaredAccessibility: Accessibility.Public };
+        var hasGetter = symbol.GetMethod is { DeclaredAccessibility: Accessibility.Public };
 
         SetPropertyType? setPropertyType = null;
-        if (property.SetMethod is { DeclaredAccessibility: Accessibility.Public })
+        if (symbol.SetMethod is { DeclaredAccessibility: Accessibility.Public })
         {
-            setPropertyType = property.SetMethod.IsInitOnly ? SetPropertyType.Init : SetPropertyType.Set;
+            setPropertyType = symbol.SetMethod.IsInitOnly ? SetPropertyType.Init : SetPropertyType.Set;
         }
 
-        var name = property.Name;
-        if (property.IsIndexer)
+        var name = symbol.Name;
+        if (symbol.IsIndexer)
         {
             name = name.TrimEnd('[', ']');
+
+            if (indexerSyntax == null)
+            {
+                throw new ArgumentNullException(nameof(indexerSyntax),
+                    "Indexer syntax cannot be null when property is an indexer");
+            }
         }
 
-        return new(name, property.Type.ToDisplayString(),
-            property.Parameters.Select(ConvertParameter).ToArray(),
+        var parameters = indexerSyntax?.ParameterList.Parameters
+            .Select(ConvertParameter)
+            .ToArray();
+
+        return new(name, symbol.Type.ToDisplayString(),
+            parameters ?? Array.Empty<ParameterToGenerate>(),
             hasGetter, setPropertyType,
-            property.GetDocumentationCommentXml(cancellationToken: ct));
+            symbol.GetDocumentationCommentXml(cancellationToken: ct));
     }
 
-    private static ParameterToGenerate ConvertParameter(IParameterSymbol parameter) =>
-        new(parameter.Name, parameter.Type.ToDisplayString());
+    private static ParameterToGenerate ConvertParameter(ParameterSyntax parameter) =>
+        new(parameter.ToFullString().Trim(' '));
 }
