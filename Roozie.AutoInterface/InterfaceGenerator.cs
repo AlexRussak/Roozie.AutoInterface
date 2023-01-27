@@ -14,7 +14,10 @@ internal static class InterfaceGenerator
             sb.Append($"using {u};").AppendLine();
         }
 
-        sb.AppendLine();
+        if (toGenerate.Usings.Count > 0)
+        {
+            sb.AppendLine();
+        }
 
         sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};").AppendLine();
         sb.AppendLine("#nullable enable").AppendLine();
