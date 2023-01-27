@@ -1,12 +1,12 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <VersionPrefix>0.4.0</VersionPrefix>
     <VersionSuffix>beta</VersionSuffix>
     <PackageVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
     <Authors>Alex Russak</Authors>
     <Description>C# source generator to automatically create an interface from a class</Description>
-    <PackageTags>source generator;C#</PackageTags>
+    <PackageTags>generator generation codegen codegenerator codegeneration sourcegenerator sourcegeneration</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/AlexRussak/Roozie.AutoInterface</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AlexRussak/Roozie.AutoInterface</RepositoryUrl>

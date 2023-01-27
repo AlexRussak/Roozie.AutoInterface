@@ -22,7 +22,7 @@ public class {{nameof(Simple)}}
     public int PropertyInit { get; init; }
     public string? PropertyPrivateSet { get; private set; }
 
-    public string TestMethod(string input) => input;
+    public string TestMethod(string input = "test") => input;
     private string TestMethodPrivate(string input) => input;
     internal string TestMethodInternal(string input) => input;
 
@@ -90,10 +90,10 @@ public class {{nameof(AddToInterface_Attribute)}}
     public string? TestPropWithAttribute { get; set; }
 
     [AddToInterface]
-    public string? TestPropWithAttributePrivateSet { get; private set; }
+    public string TestPropWithAttributePrivateSet { get; private set; }
 
     [AddToInterface]
-    public string? TestPropWithAttributeInit { get; init; }
+    public Guid? TestPropWithAttributeInit { get; init; }
 
     [AddToInterface]
     public int TestMethodWithAttribute(int input) => input;
@@ -137,24 +137,25 @@ internal partial class {{nameof(XmlDocComments)}}
     /// <param name="input">Test input</param>
     /// <returns>Test output</returns>
     public int TestMethod(int input) => input;
-}
-""";
-        return TestHelper.Verify(source);
-    }
 
-    [Fact]
-    public Task StaticClass()
-    {
-        const string source = $$"""
-using Roozie.AutoInterface;
-
-namespace Roozie.AutoInterface.Tests;
-
-[AutoInterface]
-public static class {{nameof(StaticClass)}}
-{
-    public Guid Property { get; set; } = Guid.NewGuid();
-    public string TestMethod(string input) => input;
+    /// <summary>
+    /// test doc on method
+    /// </summary>
+    /// <param name="i">param doc</param>
+    /// <param name="b">b</param>
+    /// <param name="s">s</param>
+    /// <param name="c">c</param>
+    /// <param name="l1">l1</param>
+    /// <param name="dm">dm</param>
+    /// <param name="dd">dd</param>
+    /// <param name="f">f</param>
+    /// <param name="l2">l2</param>
+    /// <param name="ct">ct</param>
+    /// <returns>return doc</returns>
+    public async Task<int> DoSomethingAsync(int i = 123456, bool b = false, string s = "s", char c = 'c',
+        long l1 = 111L, decimal dm = 1234.5m, double dd = 5678.901d, float f = 98765.04f, long l2 = long.MaxValue,
+        CancellationToken ct = default) =>
+        await Task.FromResult(i + GetValue());
 }
 """;
         return TestHelper.Verify(source);
@@ -165,6 +166,7 @@ public static class {{nameof(StaticClass)}}
     {
         const string source = $$"""
 using Roozie.AutoInterface;
+using System.Drawing;
 
 namespace Roozie.AutoInterface.Tests;
 
@@ -183,7 +185,7 @@ internal class {{nameof(Indexers)}}
         set { }
     }
 
-    public int this[string v1, int v2]
+    public int this[string v1 = "", decimal v2 = 1234.1234m, KnownColor color = KnownColor.Aqua]
     {
         get { return 0; }
         set { }

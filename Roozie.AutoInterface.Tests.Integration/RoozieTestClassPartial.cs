@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace Roozie.AutoInterface.Tests.Integration;
 
 // ReSharper disable UnusedMember.Global
@@ -23,10 +25,27 @@ internal partial class RoozieTestClassPartial
     /// test doc on method
     /// </summary>
     /// <param name="i">param doc</param>
+    /// <param name="b">b</param>
+    /// <param name="s">s</param>
+    /// <param name="c">c</param>
+    /// <param name="l1">l1</param>
+    /// <param name="dm">dm</param>
+    /// <param name="dd">dd</param>
+    /// <param name="f">f</param>
+    /// <param name="l2">l2</param>
+    /// <param name="ct">ct</param>
     /// <returns>return doc</returns>
-    public async Task<int> DoSomethingAsync(int i) => await Task.FromResult(i + GetValue());
+    public async Task<int> DoSomethingAsync(int i = 123456, bool b = false, string s = "s", char c = 'c',
+        long l1 = 111L, decimal dm = 1234.5m, double dd = 5678.901d, float f = 98765.04f, long l2 = long.MaxValue,
+        CancellationToken ct = default) =>
+        await Task.FromResult(i + GetValue());
 
-    public string? GetProp() => PropPrivateGet;
+    public string? GetProp(string? blah = null) => PropPrivateGet;
+    public string? GetProp2(TimeSpan? blah = null) => PropPrivateGet;
+    public int[] GetArray(params int[] i) => i;
+
+    public string EnumTest(KnownColor c = KnownColor.Red) => c.ToString();
+
 
     private int GetValue()
     {

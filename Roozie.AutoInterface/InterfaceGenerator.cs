@@ -7,14 +7,16 @@ internal static class InterfaceGenerator
     public static (string interfaceName, string sourceCode) Generate(InterfaceToGenerate toGenerate, string version)
     {
         var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
-        sb.AppendLine();
+        sb.AppendLine().AppendLine();
 
         foreach (var u in toGenerate.Usings.OrderBy(s => s, StringComparer.Ordinal))
         {
             sb.Append($"using {u};").AppendLine();
         }
 
-        sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};");
+        sb.AppendLine();
+
+        sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};").AppendLine();
         sb.AppendLine("#nullable enable").AppendLine();
 
         if (toGenerate.ImplementPartial)
@@ -77,7 +79,7 @@ internal static class InterfaceGenerator
             sb.Append('[');
             foreach (var parameter in property.Parameters)
             {
-                sb.Append($"{parameter.Type} {parameter.Name}, ");
+                sb.Append($"{parameter.Code}, ");
             }
 
             sb.Length -= 2;
@@ -95,9 +97,9 @@ internal static class InterfaceGenerator
         sb.Append($"{Spacer}{method.ReturnType} {method.Name}(");
         if (method.Parameters.Length > 0)
         {
-            foreach (var (parameterName, parameterType) in method.Parameters)
+            foreach (var para in method.Parameters)
             {
-                sb.Append(parameterType).Append(' ').Append(parameterName).Append(", ");
+                sb.Append(para.Code).Append(", ");
             }
 
             sb.Length -= 2;
