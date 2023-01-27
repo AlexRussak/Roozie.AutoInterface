@@ -90,10 +90,10 @@ public class {{nameof(AddToInterface_Attribute)}}
     public string? TestPropWithAttribute { get; set; }
 
     [AddToInterface]
-    public string? TestPropWithAttributePrivateSet { get; private set; }
+    public string TestPropWithAttributePrivateSet { get; private set; }
 
     [AddToInterface]
-    public string? TestPropWithAttributeInit { get; init; }
+    public Guid? TestPropWithAttributeInit { get; init; }
 
     [AddToInterface]
     public int TestMethodWithAttribute(int input) => input;

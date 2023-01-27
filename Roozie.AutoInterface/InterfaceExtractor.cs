@@ -76,7 +76,7 @@ internal static class InterfaceExtractor
         var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
         var usings = root.Usings
             .Select(u => u.Name.ToString())
-            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Where(u => !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Shared.Namespace, StringComparison.Ordinal))
             .OrderBy(u => u, StringComparer.Ordinal)
             .ToImmutableArray();
 

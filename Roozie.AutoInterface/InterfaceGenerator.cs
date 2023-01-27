@@ -7,14 +7,16 @@ internal static class InterfaceGenerator
     public static (string interfaceName, string sourceCode) Generate(InterfaceToGenerate toGenerate, string version)
     {
         var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
-        sb.AppendLine();
+        sb.AppendLine().AppendLine();
 
         foreach (var u in toGenerate.Usings.OrderBy(s => s, StringComparer.Ordinal))
         {
             sb.Append($"using {u};").AppendLine();
         }
 
-        sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};");
+        sb.AppendLine();
+
+        sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};").AppendLine();
         sb.AppendLine("#nullable enable").AppendLine();
 
         if (toGenerate.ImplementPartial)
