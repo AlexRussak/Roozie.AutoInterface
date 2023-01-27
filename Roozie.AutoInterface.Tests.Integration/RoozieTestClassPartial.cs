@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace Roozie.AutoInterface.Tests.Integration;
 
 // ReSharper disable UnusedMember.Global

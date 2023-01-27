@@ -106,9 +106,6 @@ public class {{nameof(AddToInterface_Attribute)}}
     public Task XmlDocComments()
     {
         const string source = $$"""
-using System;
-using Roozie.AutoInterface;
-
 namespace Roozie.AutoInterface.Tests;
 
 /// <summary>
