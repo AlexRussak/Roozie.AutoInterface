@@ -66,6 +66,7 @@ internal static class InterfaceExtractor
         var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                                settings.ImplementOnPartial;
         return new(
+            classSymbol.DeclaredAccessibility,
             classSymbol.Name,
             settings.InterfaceName ?? "I" + classSymbol.Name,
             classSymbol.ContainingNamespace.IsGlobalNamespace

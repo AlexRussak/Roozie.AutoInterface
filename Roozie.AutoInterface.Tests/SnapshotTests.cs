@@ -118,7 +118,7 @@ namespace Roozie.AutoInterface.Tests;
 /// Test class remarks
 /// </remarks>
 [AutoInterface]
-public partial class {{nameof(XmlDocComments)}}
+internal partial class {{nameof(XmlDocComments)}}
 {
     /// <summary>
     /// Test property
@@ -169,7 +169,7 @@ using Roozie.AutoInterface;
 namespace Roozie.AutoInterface.Tests;
 
 [AutoInterface]
-public class {{nameof(Indexers)}}
+internal class {{nameof(Indexers)}}
 {
     public int this[int index]
     {

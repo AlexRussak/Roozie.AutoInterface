@@ -19,7 +19,10 @@ internal static class InterfaceGenerator
 
         if (toGenerate.ImplementPartial)
         {
-            sb.AppendLine($"public partial class {toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
+#pragma warning disable CA1308 // Need the lower case string
+            sb.Append($"{toGenerate.Accessibility.ToString().ToLowerInvariant()} partial class ")
+#pragma warning restore CA1308
+                .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
                 .AppendLine();
         }
 
