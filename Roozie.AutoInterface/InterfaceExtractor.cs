@@ -82,15 +82,16 @@ internal static class InterfaceExtractor
 
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
 
+        var ns = classSymbol.ContainingNamespace.IsGlobalNamespace
+            ? string.Empty
+            : classSymbol.ContainingNamespace.ToString();
         var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                                settings.ImplementOnPartial;
         return new(
             classSymbol.DeclaredAccessibility,
             classSymbol.Name,
             settings.InterfaceName ?? "I" + classSymbol.Name,
-            classSymbol.ContainingNamespace.IsGlobalNamespace
-                ? string.Empty
-                : classSymbol.ContainingNamespace.ToString(),
+            ns,
             usings,
             methods.ToArray(),
             properties.ToArray(),
@@ -99,7 +100,7 @@ internal static class InterfaceExtractor
             classDeclarationSyntax.GetLocation());
     }
 
-    private static (MethodToGenerate? method, PropertyToGenerate? property) ConvertMember(
+    private static (MethodToGenerate? Method, PropertyToGenerate? Property) ConvertMember(
         MemberDeclarationSyntax memberSyntax, ISymbol symbol, GeneratorSettings settings, CancellationToken ct)
     {
         var memberContainsAttribute = false;

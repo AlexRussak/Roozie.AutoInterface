@@ -17,7 +17,7 @@ public class Generator : IIncrementalGenerator
         var interfacesToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
                 Shared.FullNames.AutoInterfaceAttribute,
                 (node, _) => node is ClassDeclarationSyntax,
-                (syntaxContext, token) => Generate(syntaxContext, token))
+                static (syntaxContext, token) => Generate(syntaxContext, token))
             .Where(static s => s != null);
 
         context.RegisterSourceOutput(interfacesToGenerate,

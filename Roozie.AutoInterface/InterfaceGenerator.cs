@@ -4,7 +4,7 @@ internal static class InterfaceGenerator
 {
     private const string Spacer = "    ";
 
-    public static (string interfaceName, string sourceCode) Generate(InterfaceToGenerate toGenerate, string version)
+    public static (string InterfaceName, string SourceCode) Generate(InterfaceToGenerate toGenerate, string version)
     {
         var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
         sb.AppendLine().AppendLine();

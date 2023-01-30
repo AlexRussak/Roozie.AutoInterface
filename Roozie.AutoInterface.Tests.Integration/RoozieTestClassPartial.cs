@@ -15,6 +15,20 @@ namespace Roozie.AutoInterface.Tests.Integration;
 internal partial class RoozieTestClassPartial
 {
     /// <summary>
+    /// test doc on property
+    /// </summary>
+    public string PropertyNormal { get; set; } = "prop";
+
+    /// <summary>
+    /// test doc on another property
+    /// </summary>
+    public int PropertyGet { get; private set; }
+
+    public int PropertyInit { get; init; }
+
+    public string? PropPrivateGet { private get; set; }
+
+    /// <summary>
     /// test doc on method
     /// </summary>
     public bool NoParamMethod() => true;
@@ -44,24 +58,9 @@ internal partial class RoozieTestClassPartial
 
     public string EnumTest(KnownColor c = KnownColor.Red) => c.ToString();
 
-
     private int GetValue()
     {
         PropertyGet = 1234;
         return 42;
     }
-
-    /// <summary>
-    /// test doc on property
-    /// </summary>
-    public string PropertyNormal { get; set; } = "prop";
-
-    /// <summary>
-    /// test doc on another property
-    /// </summary>
-    public int PropertyGet { get; private set; }
-
-    public int PropertyInit { get; init; }
-
-    public string? PropPrivateGet { private get; set; }
 }
