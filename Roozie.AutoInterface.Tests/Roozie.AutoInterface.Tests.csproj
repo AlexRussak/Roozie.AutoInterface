@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Roozie.AutoInterface\Roozie.AutoInterface.csproj"/>
-    <ProjectReference Include="..\Roozie.AutoInterface.Attributes\Roozie.AutoInterface.Attributes.csproj"/>
+    <ProjectReference Include="..\Roozie.AutoInterface\Roozie.AutoInterface.csproj" />
+    <ProjectReference Include="..\Roozie.AutoInterface.Attributes\Roozie.AutoInterface.Attributes.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,17 +16,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="FluentAssertions" />
     <PackageReference Include="FluentAssertions.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-    <PackageReference Include="Verify.SourceGenerators"/>
-    <PackageReference Include="Verify.Xunit"/>
-    <PackageReference Include="xunit"/>
-    <PackageReference Include="xunit.analyzers"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Verify.SourceGenerators" />
+    <PackageReference Include="Verify.Xunit" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.analyzers" />
     <PackageReference Include="xunit.runner.visualstudio">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

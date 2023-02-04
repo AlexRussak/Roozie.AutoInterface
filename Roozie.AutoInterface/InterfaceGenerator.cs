@@ -27,8 +27,7 @@ internal static class InterfaceGenerator
 #pragma warning disable CA1308 // Need the lower case string
             sb.Append($"{toGenerate.Accessibility.ToString().ToLowerInvariant()} partial class ")
 #pragma warning restore CA1308
-                .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
-                .AppendLine();
+                .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}").AppendLine();
         }
 
         AddXmlDoc(sb, toGenerate.XmlDoc, null);
