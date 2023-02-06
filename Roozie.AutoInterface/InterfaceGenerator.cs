@@ -14,7 +14,7 @@ internal static class InterfaceGenerator
             sb.Append($"using {u};").AppendLine();
         }
 
-        if (toGenerate.Usings.Count > 0)
+        if (toGenerate.Usings.Length > 0)
         {
             sb.AppendLine();
         }
