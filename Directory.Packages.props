@@ -6,7 +6,7 @@
     <PackageVersion Include="coverlet.collector" Version="3.2.0"/>
     <PackageVersion Include="FluentAssertions" Version="6.9.0"/>
     <PackageVersion Include="FluentAssertions.Analyzers" Version="0.17.2"/>
-    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.13">
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.29">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageVersion>
