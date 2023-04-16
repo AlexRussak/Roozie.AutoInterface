@@ -38,7 +38,8 @@ jobs:
       - name: pack
         run: dotnet pack 'Roozie.AutoInterface.sln' -c Release --no-build
 
-      - uses: actions/upload-artifact@v3
+      - name: upload nuget
+        uses: actions/upload-artifact@v3
         with:
           name: nuget
           if-no-files-found: error

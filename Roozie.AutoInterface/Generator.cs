@@ -1,4 +1,3 @@
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -8,10 +7,7 @@ namespace Roozie.AutoInterface;
 [Generator(LanguageNames.CSharp)]
 public class Generator : IIncrementalGenerator
 {
-    private static readonly string Version
-        = typeof(Generator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-              ?.InformationalVersion ??
-          typeof(Generator).Assembly.GetName().Version.ToString();
+    private static readonly string Version = typeof(Generator).Assembly.GetName().Version.ToString();
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
