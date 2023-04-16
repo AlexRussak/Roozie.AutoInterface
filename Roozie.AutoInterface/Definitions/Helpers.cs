@@ -1,10 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Roozie.AutoInterface.Definitions;
 
-[SuppressMessage("StyleCop.CSharp.OrderingRules",
-    "SA1201:Elements should appear in the correct order",
-    Justification = "Shared/Utility class")]
 internal static class Helpers
 {
     internal const string Namespace = $"{nameof(Roozie)}.{nameof(AutoInterface)}";
