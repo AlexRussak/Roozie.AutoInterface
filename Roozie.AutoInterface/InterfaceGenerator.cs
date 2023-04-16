@@ -4,9 +4,9 @@ internal static class InterfaceGenerator
 {
     private const string Spacer = "    ";
 
-    public static (string interfaceName, string sourceCode) Generate(InterfaceToGenerate toGenerate, string version)
+    public static (string InterfaceName, string SourceCode) Generate(InterfaceToGenerate toGenerate, string version)
     {
-        var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
+        var sb = new StringBuilder(Helpers.GetGeneratedFileComment(version));
         sb.AppendLine().AppendLine();
 
         foreach (var u in toGenerate.Usings.OrderBy(s => s, StringComparer.Ordinal))
@@ -14,7 +14,7 @@ internal static class InterfaceGenerator
             sb.Append($"using {u};").AppendLine();
         }
 
-        if (toGenerate.Usings.Count > 0)
+        if (toGenerate.Usings.Length > 0)
         {
             sb.AppendLine();
         }
@@ -24,9 +24,7 @@ internal static class InterfaceGenerator
 
         if (toGenerate.ImplementPartial)
         {
-#pragma warning disable CA1308 // Need the lower case string
             sb.Append($"{toGenerate.Accessibility.ToString().ToLowerInvariant()} partial class ")
-#pragma warning restore CA1308
                 .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
                 .AppendLine();
         }

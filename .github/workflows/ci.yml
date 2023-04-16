@@ -5,15 +5,16 @@ on:
     branches:
       - "main"
     paths-ignore:
-      - "**.md"
       - "LICENSE"
   pull_request:
     branches:
       - "main"
     paths-ignore:
-      - "**.md"
       - "LICENSE"
   workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
 
 jobs:
   build:
@@ -26,8 +27,21 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "7.0.x"
+          global-json-file: global.json
 
-      - run: dotnet build 'Roozie.AutoInterface.sln' -c Release
+      - name: build
+        run: dotnet build 'Roozie.AutoInterface.sln' -c Release
 
-      - run: dotnet test 'Roozie.AutoInterface.sln' -c Release --no-build
+      - name: test
+        run: dotnet test 'Roozie.AutoInterface.sln' -c Release --no-build
+
+      - name: pack
+        run: dotnet pack 'Roozie.AutoInterface.sln' -c Release --no-build
+
+      - name: upload nuget
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget
+          if-no-files-found: error
+          retention-days: 3
+          path: 'artifacts/*.nupkg'

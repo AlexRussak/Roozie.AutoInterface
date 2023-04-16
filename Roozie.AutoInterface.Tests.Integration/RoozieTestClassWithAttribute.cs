@@ -16,6 +16,24 @@ namespace Roozie.AutoInterface.Tests.Integration;
 public class RoozieTestClassWithAttribute : IRoozieTestClassWithAttribute
 {
     /// <summary>
+    /// test doc on property
+    /// </summary>
+    [AddToInterface]
+    public string PropertyNormalWithAttribute { get; set; } = "prop";
+
+    /// <summary>
+    /// test doc on another property
+    /// </summary>
+    [AddToInterface]
+    public int PropertyGetWithAttribute { get; private set; }
+
+    [AddToInterface]
+    public int PropertyInitWithAttribute { get; init; }
+
+    [AddToInterface]
+    public string? PropPrivateGetWithAttribute { private get; set; }
+
+    /// <summary>
     /// test doc on method
     /// </summary>
     [AddToInterface]
@@ -37,22 +55,4 @@ public class RoozieTestClassWithAttribute : IRoozieTestClassWithAttribute
         PropertyGetWithAttribute = 1234;
         return 42;
     }
-
-    /// <summary>
-    /// test doc on property
-    /// </summary>
-    [AddToInterface]
-    public string PropertyNormalWithAttribute { get; set; } = "prop";
-
-    /// <summary>
-    /// test doc on another property
-    /// </summary>
-    [AddToInterface]
-    public int PropertyGetWithAttribute { get; private set; }
-
-    [AddToInterface]
-    public int PropertyInitWithAttribute { get; init; }
-
-    [AddToInterface]
-    public string? PropPrivateGetWithAttribute { private get; set; }
 }

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+  "settings": {
+    "orderingRules": {
+      "systemUsingDirectivesFirst": true,
+      "blankLinesBetweenUsingGroups": "omit",
+      "usingDirectivesPlacement": "outsideNamespace"
+    },
+    "namingRules": {
+      "allowCommonHungarianPrefixes": false,
+      "includeInferredTupleElementNames": true
+    },
+    "layoutRules": {
+      "allowDoWhileOnClosingBrace": true
+    }
+  }
+}

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,15 +6,12 @@ namespace Roozie.AutoInterface;
 
 internal static class InterfaceExtractor
 {
-    private static readonly ImmutableArray<string> ObjectMethods = new[]
-    {
-        nameof(ToString),
-        nameof(GetHashCode),
-        nameof(Equals),
-    }.ToImmutableArray();
+    private static readonly string[] ObjectMethods = { nameof(ToString), nameof(GetHashCode), nameof(Equals), };
 
-    public static InterfaceToGenerate? ProcessClass(AttributeData attributeData,
-        ClassDeclarationSyntax? classDeclarationSyntax, SemanticModel semanticModel,
+    public static InterfaceToGenerate? ProcessClass(
+        AttributeData attributeData,
+        ClassDeclarationSyntax? classDeclarationSyntax,
+        SemanticModel semanticModel,
         CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
@@ -32,14 +28,18 @@ internal static class InterfaceExtractor
 
         if (classSymbol.IsStatic)
         {
-            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility, classSymbol.Name,
-                classDeclarationSyntax.GetLocation(), ErrorType.StaticClass);
+            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility,
+                classSymbol.Name,
+                classDeclarationSyntax.GetLocation(),
+                ErrorType.StaticClass);
         }
 
         if (classSymbol.DeclaredAccessibility is not Accessibility.Public and not Accessibility.Internal)
         {
-            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility, classSymbol.Name,
-                classDeclarationSyntax.GetLocation(), ErrorType.InvalidAccessibility);
+            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility,
+                classSymbol.Name,
+                classDeclarationSyntax.GetLocation(),
+                ErrorType.InvalidAccessibility);
         }
 
         var settings = GetSettings(attributeData);
@@ -74,23 +74,23 @@ internal static class InterfaceExtractor
         }
 
         var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
-        var usings = root.Usings
-            .Select(u => u.Name.ToString())
-            .Where(u => !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Shared.Namespace, StringComparison.Ordinal))
-            .OrderBy(u => u, StringComparer.Ordinal)
-            .ToImmutableArray();
+        var usings = root.Usings.Select(static u => u.Name.ToString())
+            .Where(static u =>
+                !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Helpers.Namespace, StringComparison.Ordinal))
+            .OrderBy(static u => u, StringComparer.Ordinal)
+            .ToArray();
 
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
 
+        var ns = classSymbol.ContainingNamespace.IsGlobalNamespace
+            ? string.Empty
+            : classSymbol.ContainingNamespace.ToString();
         var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                                settings.ImplementOnPartial;
-        return new(
-            classSymbol.DeclaredAccessibility,
+        return new(classSymbol.DeclaredAccessibility,
             classSymbol.Name,
             settings.InterfaceName ?? "I" + classSymbol.Name,
-            classSymbol.ContainingNamespace.IsGlobalNamespace
-                ? string.Empty
-                : classSymbol.ContainingNamespace.ToString(),
+            ns,
             usings,
             methods.ToArray(),
             properties.ToArray(),
@@ -99,20 +99,21 @@ internal static class InterfaceExtractor
             classDeclarationSyntax.GetLocation());
     }
 
-    private static (MethodToGenerate? method, PropertyToGenerate? property) ConvertMember(
-        MemberDeclarationSyntax memberSyntax, ISymbol symbol, GeneratorSettings settings, CancellationToken ct)
+    private static (MethodToGenerate? Method, PropertyToGenerate? Property) ConvertMember(
+        MemberDeclarationSyntax memberSyntax,
+        ISymbol symbol,
+        GeneratorSettings settings,
+        CancellationToken ct)
     {
         var memberContainsAttribute = false;
         var memberAttrs = symbol.GetAttributes();
-        if (memberAttrs.Any(a =>
-                string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute),
-                    StringComparison.Ordinal)))
+        if (memberAttrs.Any(static a =>
+                string.Equals(a.AttributeClass?.Name, nameof(AddToInterfaceAttribute), StringComparison.Ordinal)))
         {
             memberContainsAttribute = true;
         }
 
-        if (symbol is IMethodSymbol methodSymbol &&
-            (memberContainsAttribute || settings.IncludeMethods))
+        if (symbol is IMethodSymbol methodSymbol && (memberContainsAttribute || settings.IncludeMethods))
         {
             if (ObjectMethods.Contains(methodSymbol.Name, StringComparer.Ordinal) ||
                 methodSymbol.MethodKind != MethodKind.Ordinary)
@@ -124,8 +125,7 @@ internal static class InterfaceExtractor
             return (ConvertMethod(methodSymbol, methodSyntax, ct), null);
         }
 
-        if (symbol is IPropertySymbol propertySymbol &&
-            (memberContainsAttribute || settings.IncludeProperties))
+        if (symbol is IPropertySymbol propertySymbol && (memberContainsAttribute || settings.IncludeProperties))
         {
             var indexerSyntax = memberSyntax as IndexerDeclarationSyntax;
             return (null, ConvertProperty(propertySymbol, indexerSyntax, ct));
@@ -146,27 +146,27 @@ internal static class InterfaceExtractor
             var key = kvp.Key;
             var value = kvp.Value;
 
-            if (string.Equals(key, nameof(AutoInterfaceAttribute.Name), StringComparison.Ordinal)
-                && value.Value?.ToString() is { } s
-                && !string.IsNullOrWhiteSpace(s))
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.Name), StringComparison.Ordinal) &&
+                value.Value?.ToString() is { } s &&
+                !string.IsNullOrWhiteSpace(s))
             {
                 interfaceName = s;
             }
 
-            if (string.Equals(key, nameof(AutoInterfaceAttribute.IncludeMethods), StringComparison.Ordinal)
-                && value.Value is bool methodsFlag)
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.IncludeMethods), StringComparison.Ordinal) &&
+                value.Value is bool methodsFlag)
             {
                 includeMethods = methodsFlag;
             }
 
-            if (string.Equals(key, nameof(AutoInterfaceAttribute.IncludeProperties), StringComparison.Ordinal)
-                && value.Value is bool propertiesFlag)
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.IncludeProperties), StringComparison.Ordinal) &&
+                value.Value is bool propertiesFlag)
             {
                 includeProperties = propertiesFlag;
             }
 
-            if (string.Equals(key, nameof(AutoInterfaceAttribute.ImplementOnPartial), StringComparison.Ordinal)
-                && value.Value is bool partialFlag)
+            if (string.Equals(key, nameof(AutoInterfaceAttribute.ImplementOnPartial), StringComparison.Ordinal) &&
+                value.Value is bool partialFlag)
             {
                 implementOnPartial = partialFlag;
             }
@@ -175,19 +175,22 @@ internal static class InterfaceExtractor
         return new(interfaceName, includeMethods ?? true, includeProperties ?? true, implementOnPartial ?? true);
     }
 
-    private static MethodToGenerate ConvertMethod(IMethodSymbol symbol, BaseMethodDeclarationSyntax syntax,
+    private static MethodToGenerate ConvertMethod(
+        IMethodSymbol symbol,
+        BaseMethodDeclarationSyntax syntax,
         CancellationToken ct)
     {
-        var parameters = syntax.ParameterList.Parameters
-            .Select(ConvertParameter)
-            .ToArray();
+        var parameters = syntax.ParameterList.Parameters.Select(ConvertParameter).ToArray();
 
-        return new(symbol.Name, symbol.ReturnType.ToDisplayString(),
+        return new(symbol.Name,
+            symbol.ReturnType.ToDisplayString(),
             parameters,
             symbol.GetDocumentationCommentXml(cancellationToken: ct));
     }
 
-    private static PropertyToGenerate ConvertProperty(IPropertySymbol symbol, IndexerDeclarationSyntax? indexerSyntax,
+    private static PropertyToGenerate ConvertProperty(
+        IPropertySymbol symbol,
+        IndexerDeclarationSyntax? indexerSyntax,
         CancellationToken ct)
     {
         var hasGetter = symbol.GetMethod is { DeclaredAccessibility: Accessibility.Public };
@@ -210,13 +213,13 @@ internal static class InterfaceExtractor
             }
         }
 
-        var parameters = indexerSyntax?.ParameterList.Parameters
-            .Select(ConvertParameter)
-            .ToArray();
+        var parameters = indexerSyntax?.ParameterList.Parameters.Select(ConvertParameter).ToArray();
 
-        return new(name, symbol.Type.ToDisplayString(),
+        return new(name,
+            symbol.Type.ToDisplayString(),
             parameters ?? Array.Empty<ParameterToGenerate>(),
-            hasGetter, setPropertyType,
+            hasGetter,
+            setPropertyType,
             symbol.GetDocumentationCommentXml(cancellationToken: ct));
     }
 
