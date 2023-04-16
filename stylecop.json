@@ -7,10 +7,11 @@
       "usingDirectivesPlacement": "outsideNamespace"
     },
     "namingRules": {
+      "allowCommonHungarianPrefixes": false,
       "includeInferredTupleElementNames": true
     },
     "layoutRules": {
-      "newlineAtEndOfFile": "require"
+      "allowDoWhileOnClosingBrace": true
     }
   }
 }

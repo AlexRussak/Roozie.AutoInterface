@@ -67,7 +67,7 @@ dotnet_diagnostic.IDE0044.severity = error
 dotnet_style_readonly_field = true
 
 # IDE0059: Remove unnecessary value assignment
-dotnet_diagnostic.IDE0059.severity = error
+dotnet_diagnostic.IDE0059.severity = warning
 
 # IDE0074: Use compound assignment
 dotnet_diagnostic.IDE0074.severity = error
@@ -520,9 +520,6 @@ dotnet_diagnostic.CA2219.severity = error
 # CA2224: Override Equals on overloading operator equals
 dotnet_diagnostic.CA2224.severity = error
 
-# CA2225: Operator overloads have named alternates
-dotnet_diagnostic.CA2225.severity = error
-
 # CA2226: Operators should have symmetrical overloads
 dotnet_diagnostic.CA2226.severity = error
 
@@ -864,7 +861,7 @@ MA0011.exclude_tostring_methods = true
 # MA0016: Prefer returning collection abstraction instead of implementation
 dotnet_diagnostic.MA0016.severity = none
 
-# MA0026: Fix TODO comment
+# MA0026: Fix T O D O comment
 dotnet_diagnostic.MA0026.severity = suggestion
 
 # MA0040: Forward the CancellationToken parameter to methods that take one
@@ -907,9 +904,6 @@ dotnet_diagnostic.SA1413.severity = none
 
 # SA1516: Elements should be separated by blank line
 dotnet_diagnostic.SA1516.severity = none
-
-# SA1518: A closing brace must not be preceded by a blank line
-dotnet_diagnostic.SA1518.severity = none
 
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = none
