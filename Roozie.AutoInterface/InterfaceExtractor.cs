@@ -8,8 +8,11 @@ internal static class InterfaceExtractor
 {
     private static readonly string[] ObjectMethods = { nameof(ToString), nameof(GetHashCode), nameof(Equals), };
 
-    public static InterfaceToGenerate? ProcessClass(AttributeData attributeData,
-        ClassDeclarationSyntax? classDeclarationSyntax, SemanticModel semanticModel, CancellationToken ct = default)
+    public static InterfaceToGenerate? ProcessClass(
+        AttributeData attributeData,
+        ClassDeclarationSyntax? classDeclarationSyntax,
+        SemanticModel semanticModel,
+        CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
 
@@ -25,14 +28,18 @@ internal static class InterfaceExtractor
 
         if (classSymbol.IsStatic)
         {
-            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility, classSymbol.Name,
-                classDeclarationSyntax.GetLocation(), ErrorType.StaticClass);
+            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility,
+                classSymbol.Name,
+                classDeclarationSyntax.GetLocation(),
+                ErrorType.StaticClass);
         }
 
         if (classSymbol.DeclaredAccessibility is not Accessibility.Public and not Accessibility.Internal)
         {
-            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility, classSymbol.Name,
-                classDeclarationSyntax.GetLocation(), ErrorType.InvalidAccessibility);
+            return InterfaceToGenerate.Error(classSymbol.DeclaredAccessibility,
+                classSymbol.Name,
+                classDeclarationSyntax.GetLocation(),
+                ErrorType.InvalidAccessibility);
         }
 
         var settings = GetSettings(attributeData);
@@ -69,8 +76,9 @@ internal static class InterfaceExtractor
         var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
         var usings = root.Usings.Select(static u => u.Name.ToString())
             .Where(static u =>
-                !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Shared.Namespace, StringComparison.Ordinal))
-            .OrderBy(static u => u, StringComparer.Ordinal).ToArray();
+                !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Helpers.Namespace, StringComparison.Ordinal))
+            .OrderBy(static u => u, StringComparer.Ordinal)
+            .ToArray();
 
         var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
 
@@ -79,13 +87,23 @@ internal static class InterfaceExtractor
             : classSymbol.ContainingNamespace.ToString();
         var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                                settings.ImplementOnPartial;
-        return new(classSymbol.DeclaredAccessibility, classSymbol.Name,
-            settings.InterfaceName ?? "I" + classSymbol.Name, ns, usings, methods.ToArray(), properties.ToArray(),
-            classDoc, implementPartial, classDeclarationSyntax.GetLocation());
+        return new(classSymbol.DeclaredAccessibility,
+            classSymbol.Name,
+            settings.InterfaceName ?? "I" + classSymbol.Name,
+            ns,
+            usings,
+            methods.ToArray(),
+            properties.ToArray(),
+            classDoc,
+            implementPartial,
+            classDeclarationSyntax.GetLocation());
     }
 
     private static (MethodToGenerate? Method, PropertyToGenerate? Property) ConvertMember(
-        MemberDeclarationSyntax memberSyntax, ISymbol symbol, GeneratorSettings settings, CancellationToken ct)
+        MemberDeclarationSyntax memberSyntax,
+        ISymbol symbol,
+        GeneratorSettings settings,
+        CancellationToken ct)
     {
         var memberContainsAttribute = false;
         var memberAttrs = symbol.GetAttributes();
@@ -129,7 +147,8 @@ internal static class InterfaceExtractor
             var value = kvp.Value;
 
             if (string.Equals(key, nameof(AutoInterfaceAttribute.Name), StringComparison.Ordinal) &&
-                value.Value?.ToString() is { } s && !string.IsNullOrWhiteSpace(s))
+                value.Value?.ToString() is { } s &&
+                !string.IsNullOrWhiteSpace(s))
             {
                 interfaceName = s;
             }
@@ -156,16 +175,22 @@ internal static class InterfaceExtractor
         return new(interfaceName, includeMethods ?? true, includeProperties ?? true, implementOnPartial ?? true);
     }
 
-    private static MethodToGenerate ConvertMethod(IMethodSymbol symbol, BaseMethodDeclarationSyntax syntax,
+    private static MethodToGenerate ConvertMethod(
+        IMethodSymbol symbol,
+        BaseMethodDeclarationSyntax syntax,
         CancellationToken ct)
     {
         var parameters = syntax.ParameterList.Parameters.Select(ConvertParameter).ToArray();
 
-        return new(symbol.Name, symbol.ReturnType.ToDisplayString(), parameters,
+        return new(symbol.Name,
+            symbol.ReturnType.ToDisplayString(),
+            parameters,
             symbol.GetDocumentationCommentXml(cancellationToken: ct));
     }
 
-    private static PropertyToGenerate ConvertProperty(IPropertySymbol symbol, IndexerDeclarationSyntax? indexerSyntax,
+    private static PropertyToGenerate ConvertProperty(
+        IPropertySymbol symbol,
+        IndexerDeclarationSyntax? indexerSyntax,
         CancellationToken ct)
     {
         var hasGetter = symbol.GetMethod is { DeclaredAccessibility: Accessibility.Public };
@@ -190,8 +215,12 @@ internal static class InterfaceExtractor
 
         var parameters = indexerSyntax?.ParameterList.Parameters.Select(ConvertParameter).ToArray();
 
-        return new(name, symbol.Type.ToDisplayString(), parameters ?? Array.Empty<ParameterToGenerate>(), hasGetter,
-            setPropertyType, symbol.GetDocumentationCommentXml(cancellationToken: ct));
+        return new(name,
+            symbol.Type.ToDisplayString(),
+            parameters ?? Array.Empty<ParameterToGenerate>(),
+            hasGetter,
+            setPropertyType,
+            symbol.GetDocumentationCommentXml(cancellationToken: ct));
     }
 
     private static ParameterToGenerate ConvertParameter(ParameterSyntax parameter) =>

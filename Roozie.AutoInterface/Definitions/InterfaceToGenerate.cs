@@ -4,17 +4,43 @@ namespace Roozie.AutoInterface.Definitions;
 
 internal readonly struct InterfaceToGenerate
 {
-    public InterfaceToGenerate(Accessibility accessibility, string className, string interfaceName, string ns,
-        string[] usings, MethodToGenerate[] methods, PropertyToGenerate[] properties, string? xmlDoc,
-        bool implementPartial, Location location)
-        : this(accessibility, className, interfaceName, ns, usings, methods, properties, xmlDoc, implementPartial,
-            location, null)
+    public InterfaceToGenerate(
+        Accessibility accessibility,
+        string className,
+        string interfaceName,
+        string ns,
+        string[] usings,
+        MethodToGenerate[] methods,
+        PropertyToGenerate[] properties,
+        string? xmlDoc,
+        bool implementPartial,
+        Location location)
+        : this(accessibility,
+            className,
+            interfaceName,
+            ns,
+            usings,
+            methods,
+            properties,
+            xmlDoc,
+            implementPartial,
+            location,
+            null)
     {
     }
 
-    private InterfaceToGenerate(Accessibility accessibility, string className, string interfaceName, string ns,
-        string[] usings, MethodToGenerate[] methods, PropertyToGenerate[] properties, string? xmlDoc,
-        bool implementPartial, Location location, ErrorType? errorType)
+    private InterfaceToGenerate(
+        Accessibility accessibility,
+        string className,
+        string interfaceName,
+        string ns,
+        string[] usings,
+        MethodToGenerate[] methods,
+        PropertyToGenerate[] properties,
+        string? xmlDoc,
+        bool implementPartial,
+        Location location,
+        ErrorType? errorType)
     {
         Accessibility = accessibility;
         ClassName = className;
@@ -42,7 +68,21 @@ internal readonly struct InterfaceToGenerate
     public ErrorType? ErrorType { get; }
 
     public static InterfaceToGenerate Error(
-        Accessibility accessibility, string className, Location location, ErrorType errorType) =>
-        new(accessibility, className, string.Empty, string.Empty, Array.Empty<string>(),
-            Array.Empty<MethodToGenerate>(), Array.Empty<PropertyToGenerate>(), null, false, location, errorType);
+        Accessibility accessibility,
+        string className,
+        Location location,
+        ErrorType errorType)
+    {
+        return new(accessibility,
+            className,
+            string.Empty,
+            string.Empty,
+            Array.Empty<string>(),
+            Array.Empty<MethodToGenerate>(),
+            Array.Empty<PropertyToGenerate>(),
+            null,
+            false,
+            location,
+            errorType);
+    }
 }

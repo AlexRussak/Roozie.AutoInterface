@@ -46,7 +46,7 @@ Check out the tests ([1](/Roozie.AutoInterface.Tests), [2](/Roozie.AutoInterface
 You can configure the generator in the `[AutoInterface]` attribute. The following options are available:
 
 | Option             | Default Value    | Description                                                                                                                                                      |
-| ------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------------|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Name               | "I" + Class name | Set the interface to whatever name you want.                                                                                                                     |
 | IncludeMethods     | `true`           | Set to `false`, the generator will automatically include methods in the interface. You can mark a method as included by adding the `[AddToInterface]` attribute. |
 | IncludeProperties  | `true`           | Same as IncludeMethods                                                                                                                                           |
@@ -59,4 +59,5 @@ request.
 
 # Kudos
 
-Andrew Lock's [Source Generator series](https://andrewlock.net/series/creating-a-source-generator/) is an excellent resource for learning all aspects of source generators.
+Andrew Lock's [Source Generator series](https://andrewlock.net/series/creating-a-source-generator/) is an excellent
+resource for learning all aspects of source generators.

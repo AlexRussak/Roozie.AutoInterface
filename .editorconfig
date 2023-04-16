@@ -1,5 +1,4 @@
 # https://editorconfig.org
-
 root = true
 
 [*.md]
@@ -32,26 +31,31 @@ trim_trailing_whitespace = true
 # Avoid "this." and "Me." if not necessary
 dotnet_diagnostic.IDE0003.severity = error
 dotnet_diagnostic.IDE0009.severity = error
-dotnet_style_qualification_for_event = false
-dotnet_style_qualification_for_field = false
-dotnet_style_qualification_for_method = false
-dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_event = false:suggestion
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
 
 # IDE0011: Add braces https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0011
 dotnet_diagnostic.IDE0011.severity = error
-csharp_prefer_braces = true
-
-# IDE0022: Use block body for methods
-dotnet_diagnostic.IDE0022.severity = suggestion
-csharp_style_expression_bodied_methods = when_on_single_line
+csharp_prefer_braces = true:error
 
 # IDE0023: Use block body for operators
 dotnet_diagnostic.IDE0023.severity = error
 csharp_style_expression_bodied_operators = true:error
 
+# IDE0160 & IDE0161: Use file-scoped namespace https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0161
+dotnet_diagnostic.IDE0160.severity = none
+dotnet_diagnostic.IDE0161.severity = error
+csharp_style_namespace_declarations = file_scoped:error
+
 # IDE0033: Use explicitly provided tuple name https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0033
 dotnet_diagnostic.IDE0033.severity = error
 dotnet_style_explicit_tuple_names = true
+
+# IDE0040: Add accessibility modifiers https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0040
+dotnet_diagnostic.IDE0040.severity = error
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
 
 # IDE0049: Prefer language keywords instead of framework types https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0049
 dotnet_diagnostic.IDE0049.severity = error
@@ -98,6 +102,9 @@ dotnet_diagnostic.CS1718.severity = error # https://docs.microsoft.com/en-us/dot
 
 # CS1998: Async method lacks 'await' operators and will run synchronously
 dotnet_diagnostic.CS1998.severity = error
+
+# CS4014: Call to async method lacks 'await' operator and will run synchronously
+dotnet_diagnostic.CS4014.severity = error
 
 # CS8597: Thrown value may be null
 dotnet_diagnostic.CS8597.severity = error
@@ -192,9 +199,6 @@ dotnet_diagnostic.CA1034.severity = error
 # CA1036: Override methods on comparable types
 dotnet_diagnostic.CA1036.severity = error
 
-# CA1040: Avoid empty interfaces
-dotnet_diagnostic.CA1040.severity = error
-
 # CA1041: Provide ObsoleteAttribute message
 dotnet_diagnostic.CA1041.severity = error
 
@@ -261,14 +265,8 @@ dotnet_diagnostic.CA1200.severity = error
 # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1304.severity = error
 
-# CA1305: Specify IFormatProvider
-dotnet_diagnostic.CA1305.severity = error
-
 # CA1307: Specify StringComparison for clarity
 dotnet_diagnostic.CA1307.severity = error
-
-# CA1308: Normalize strings to uppercase
-dotnet_diagnostic.CA1308.severity = error
 
 # CA1309: Use ordinal string comparison
 dotnet_diagnostic.CA1309.severity = error
@@ -356,9 +354,6 @@ dotnet_diagnostic.CA1806.severity = error
 
 # CA1810: Initialize reference type static fields inline
 dotnet_diagnostic.CA1810.severity = error
-
-# CA1812: Avoid uninstantiated internal classes
-dotnet_diagnostic.CA1812.severity = error
 
 # CA1813: Avoid unsealed attributes
 dotnet_diagnostic.CA1813.severity = error
@@ -566,6 +561,12 @@ dotnet_diagnostic.CA2247.severity = error
 
 # CA2248: Provide correct 'enum' argument to 'Enum.HasFlag'
 dotnet_diagnostic.CA2248.severity = error
+
+# CA2253: Named placeholders should not be numeric values
+dotnet_diagnostic.CA2253.severity = error
+
+# CA2254: Template should be a static expression
+dotnet_diagnostic.CA2254.severity = error
 
 # CA2249: Consider using 'string.Contains' instead of 'string.IndexOf'
 dotnet_diagnostic.CA2249.severity = error
@@ -808,7 +809,7 @@ dotnet_diagnostic.CA5392.severity = error
 dotnet_diagnostic.CA5393.severity = error
 
 # CA5394: Do not use insecure randomness
-dotnet_diagnostic.CA5394.severity = error
+dotnet_diagnostic.CA5394.severity = suggestion
 
 # CA5395: Miss HttpVerb attribute for action methods
 dotnet_diagnostic.CA5395.severity = error
@@ -855,7 +856,9 @@ dotnet_diagnostic.MA0004.severity = none
 # MA0007: Add comma after the last property
 dotnet_diagnostic.MA0007.severity = none
 
+# MA0011: IFormatProvider is missing
 # Exclude ToString methods from analysis
+dotnet_diagnostic.MA0011.severity = suggestion
 MA0011.exclude_tostring_methods = true
 
 # MA0016: Prefer returning collection abstraction instead of implementation
@@ -867,9 +870,15 @@ dotnet_diagnostic.MA0026.severity = suggestion
 # MA0040: Forward the CancellationToken parameter to methods that take one
 dotnet_diagnostic.MA0040.severity = error
 
+# MA0048: File name should match type name
+dotnet_diagnostic.MA0048.severity = none
+
 # MA0051: Method is too long
 dotnet_diagnostic.MA0051.severity = suggestion
 MA0051.maximum_lines_per_method = 100
+
+# MA0076: Do not use implicit culture-sensitive ToString in interpolated strings
+dotnet_diagnostic.MA0076.severity = none
 
 ### VSTHRD: Visual Studio threading analyzer
 # https://github.com/microsoft/vs-threading/blob/main/doc/analyzers/index.md
@@ -890,11 +899,17 @@ dotnet_diagnostic.SA1116.severity = none
 # SA1117: Parameters should be on same line or separate lines
 dotnet_diagnostic.SA1117.severity = none
 
+# SA1137: Elements should have the same indentation
+dotnet_diagnostic.SA1137.severity = error
+
 # SA1413: Use trailing comma in multi-line initializers
 dotnet_diagnostic.SA1413.severity = none
 
 # SA1516: Elements should be separated by blank line
 dotnet_diagnostic.SA1516.severity = none
+
+# SA1518: A closing brace must not be preceded by a blank line
+dotnet_diagnostic.SA1518.severity = none
 
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = none

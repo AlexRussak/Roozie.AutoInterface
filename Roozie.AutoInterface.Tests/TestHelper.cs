@@ -14,7 +14,8 @@ public static class TestHelper
         // Create references for assemblies we require
         var references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(static a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
-            .Select(static a => MetadataReference.CreateFromFile(a.Location)).Concat(new[]
+            .Select(static a => MetadataReference.CreateFromFile(a.Location))
+            .Concat(new[]
             {
                 MetadataReference.CreateFromFile(typeof(Generator).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(AutoInterfaceAttribute).Assembly.Location),

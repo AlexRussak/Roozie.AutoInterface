@@ -6,7 +6,7 @@ internal static class InterfaceGenerator
 
     public static (string InterfaceName, string SourceCode) Generate(InterfaceToGenerate toGenerate, string version)
     {
-        var sb = new StringBuilder(Shared.GetGeneratedFileComment(version));
+        var sb = new StringBuilder(Helpers.GetGeneratedFileComment(version));
         sb.AppendLine().AppendLine();
 
         foreach (var u in toGenerate.Usings.OrderBy(s => s, StringComparer.Ordinal))
@@ -24,10 +24,9 @@ internal static class InterfaceGenerator
 
         if (toGenerate.ImplementPartial)
         {
-#pragma warning disable CA1308 // Need the lower case string
             sb.Append($"{toGenerate.Accessibility.ToString().ToLowerInvariant()} partial class ")
-#pragma warning restore CA1308
-                .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}").AppendLine();
+                .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
+                .AppendLine();
         }
 
         AddXmlDoc(sb, toGenerate.XmlDoc, null);
