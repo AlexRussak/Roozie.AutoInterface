@@ -126,7 +126,7 @@ internal partial class {{nameof(XmlDocComments)}}
     public string? Test { get; private set; }
 
     /// <summary>
-    /// Test method <see cref="TestClass"/>
+    /// Test method <see cref="{{nameof(XmlDocComments)}}"/>
     /// </summary>
     /// <remarks>
     /// Test method remarks
@@ -187,6 +187,34 @@ internal class {{nameof(Indexers)}}
         get { return 0; }
         set { }
     }
+}
+""";
+        return TestHelper.Verify(source);
+    }
+
+    [Fact]
+    public Task GenericMethods()
+    {
+        const string source = $$"""
+using Roozie.AutoInterface;
+using System.Drawing;
+
+namespace Roozie.AutoInterface.Tests;
+
+[AutoInterface]
+internal class {{nameof(GenericMethods)}}
+{
+    /// <summary>
+    /// This is a test comment for <see cref="System.Drawing.Color"/>
+    /// </summary>
+    /// <param name="input"></param>
+    /// <typeparam name="T">doc</typeparam>
+    /// <returns></returns>
+    public T TestMethod<T>(T input) => input;
+
+    public T3? TestMethod2<T1, T2, T3>(T1 input1, T2 input2) => default;
+
+    public T TestMethod3<T>(T input) where T : class => input;
 }
 """;
         return TestHelper.Verify(source);
