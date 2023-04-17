@@ -29,7 +29,11 @@ internal static class InterfaceGenerator
                 .AppendLine();
         }
 
-        AddXmlDoc(sb, toGenerate.XmlDoc, null);
+        if (!string.IsNullOrWhiteSpace(toGenerate.XmlDoc))
+        {
+            sb.AppendLine(TrimLineBreaks(toGenerate.XmlDoc!).TrimEnd());
+        }
+
         sb.AppendLine($"public partial interface {toGenerate.InterfaceName}");
         sb.AppendLine("{");
 
@@ -65,6 +69,18 @@ internal static class InterfaceGenerator
         }
 
         var sb = new StringBuilder();
+
+        if (!string.IsNullOrWhiteSpace(property.XmlDoc))
+        {
+            sb.AppendLine(TrimLineBreaks(property.XmlDoc!).TrimEnd());
+        }
+
+        sb.Append($"{Spacer}{property.Type.Trim()} {property.Name.Trim()}");
+        if (!string.IsNullOrWhiteSpace(property.Parameters))
+        {
+            sb.Append(property.Parameters!.Trim());
+        }
+
         var getString = property.HasGetter ? "get;" : string.Empty;
         var setString = property.SetType switch
         {
@@ -73,76 +89,48 @@ internal static class InterfaceGenerator
             _ => string.Empty
         };
 
-        AddXmlDoc(sb, property.XmlDoc, Spacer);
-        sb.Append($"{Spacer}{property.Type} {property.Name}");
-        if (property.Parameters.Length > 0)
+        sb.Append(" { ");
+        if (!string.IsNullOrWhiteSpace(getString))
         {
-            sb.Append('[');
-            foreach (var parameter in property.Parameters)
-            {
-                sb.Append($"{parameter.Code}, ");
-            }
-
-            sb.Length -= 2;
-            sb.Append(']');
+            sb.Append(getString).Append(' ');
         }
 
-        sb.AppendLine($" {{{getString}{setString}}}").AppendLine();
+        if (!string.IsNullOrWhiteSpace(setString))
+        {
+            sb.Append(setString).Append(' ');
+        }
+
+        sb.AppendLine("}").AppendLine();
         return sb.ToString();
     }
 
     private static string GenerateMethod(MethodToGenerate method)
     {
         var sb = new StringBuilder();
-        AddXmlDoc(sb, method.XmlDoc, Spacer);
-        sb.Append($"{Spacer}{method.ReturnType} {method.Name}(");
-        if (method.Parameters.Length > 0)
+        if (!string.IsNullOrWhiteSpace(method.XmlDoc))
         {
-            foreach (var para in method.Parameters)
-            {
-                sb.Append(para.Code).Append(", ");
-            }
-
-            sb.Length -= 2;
+            sb.AppendLine(TrimLineBreaks(method.XmlDoc!).TrimEnd());
         }
 
-        sb.AppendLine(");").AppendLine();
+        sb.Append($"{Spacer}{method.ReturnType.Trim()} {method.Name.Trim()}");
+        if (method.TypeParameters != null)
+        {
+            sb.Append(method.TypeParameters.Trim());
+        }
+
+        sb.Append(method.Parameters.Trim());
+
+        if (method.TypeConstraints != null)
+        {
+            sb.Append(' ').Append(method.TypeConstraints.Trim());
+        }
+
+        sb.AppendLine(";").AppendLine();
         return sb.ToString();
     }
 
-    private static void AddXmlDoc(StringBuilder sb, string? xmlDoc, string? indent)
+    private static string TrimLineBreaks(string s)
     {
-        if (string.IsNullOrEmpty(xmlDoc))
-        {
-            return;
-        }
-
-#pragma warning disable RS1035 // Need to use Environment.NewLine
-        var split = xmlDoc!.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-#pragma warning restore RS1035
-        foreach (var s in split)
-        {
-            // The xml docs are wrapped in <member> tags, so we need to remove them
-            // <member name="T:Roozie.AutoInterface.Tests.TestClass">
-            // </member>
-            if (s.StartsWith("<member ", StringComparison.Ordinal) ||
-                string.Equals(s, "</member>", StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            sb.AppendLine($"{indent ?? string.Empty}///{RemoveLeadingSpaces(s, 3)}");
-        }
-    }
-
-    private static string RemoveLeadingSpaces(string s, int removeCount)
-    {
-        var index = 0;
-        while (index < s.Length && index < removeCount && s[index] == ' ')
-        {
-            index++;
-        }
-
-        return s.Substring(index);
+        return s.Trim('\r', '\n');
     }
 }

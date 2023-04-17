@@ -61,7 +61,7 @@ internal static class InterfaceExtractor
                 continue;
             }
 
-            var (method, property) = ConvertMember(memberSyntax, memberSymbol, settings, ct);
+            var (method, property) = ConvertMember(memberSyntax, memberSymbol, settings);
             if (method != null)
             {
                 methods.Add(method.Value);
@@ -73,14 +73,16 @@ internal static class InterfaceExtractor
             }
         }
 
-        var root = (CompilationUnitSyntax)classDeclarationSyntax.SyntaxTree.GetRoot(ct);
+        var root = classDeclarationSyntax.SyntaxTree.GetCompilationUnitRoot(ct);
         var usings = root.Usings.Select(static u => u.Name.ToString())
             .Where(static u =>
                 !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Helpers.Namespace, StringComparison.Ordinal))
             .OrderBy(static u => u, StringComparer.Ordinal)
             .ToArray();
 
-        var classDoc = classSymbol.GetDocumentationCommentXml(cancellationToken: ct);
+        var classDoc = classDeclarationSyntax.HasLeadingTrivia
+            ? classDeclarationSyntax.GetLeadingTrivia().ToFullString()
+            : null;
 
         var ns = classSymbol.ContainingNamespace.IsGlobalNamespace
             ? string.Empty
@@ -102,8 +104,7 @@ internal static class InterfaceExtractor
     private static (MethodToGenerate? Method, PropertyToGenerate? Property) ConvertMember(
         MemberDeclarationSyntax memberSyntax,
         ISymbol symbol,
-        GeneratorSettings settings,
-        CancellationToken ct)
+        GeneratorSettings settings)
     {
         var memberContainsAttribute = false;
         var memberAttrs = symbol.GetAttributes();
@@ -122,13 +123,18 @@ internal static class InterfaceExtractor
             }
 
             var methodSyntax = (MethodDeclarationSyntax)memberSyntax;
-            return (ConvertMethod(methodSymbol, methodSyntax, ct), null);
+            return (ConvertMethod(methodSyntax), null);
         }
 
         if (symbol is IPropertySymbol propertySymbol && (memberContainsAttribute || settings.IncludeProperties))
         {
-            var indexerSyntax = memberSyntax as IndexerDeclarationSyntax;
-            return (null, ConvertProperty(propertySymbol, indexerSyntax, ct));
+            switch (memberSyntax)
+            {
+                case PropertyDeclarationSyntax propertySyntax:
+                    return (null, ConvertProperty(propertySymbol, propertySyntax));
+                case IndexerDeclarationSyntax indexerSyntax:
+                    return (null, ConvertIndexer(propertySymbol, indexerSyntax));
+            }
         }
 
         return (null, null);
@@ -175,23 +181,56 @@ internal static class InterfaceExtractor
         return new(interfaceName, includeMethods ?? true, includeProperties ?? true, implementOnPartial ?? true);
     }
 
-    private static MethodToGenerate ConvertMethod(
-        IMethodSymbol symbol,
-        BaseMethodDeclarationSyntax syntax,
-        CancellationToken ct)
+    private static MethodToGenerate ConvertMethod(MethodDeclarationSyntax syntax)
     {
-        var parameters = syntax.ParameterList.Parameters.Select(ConvertParameter).ToArray();
+        var typeConstraints = syntax.ConstraintClauses.Count > 0 ? syntax.ConstraintClauses.ToFullString() : null;
+        var trivia = syntax.HasLeadingTrivia ? syntax.GetLeadingTrivia().ToFullString() : null;
 
-        return new(symbol.Name,
-            symbol.ReturnType.ToDisplayString(),
-            parameters,
-            symbol.GetDocumentationCommentXml(cancellationToken: ct));
+        return new(syntax.Identifier.ToFullString(),
+            syntax.ReturnType.ToFullString(),
+            syntax.ParameterList.ToFullString(),
+            trivia,
+            syntax.TypeParameterList?.ToFullString(),
+            typeConstraints);
     }
 
-    private static PropertyToGenerate ConvertProperty(
-        IPropertySymbol symbol,
-        IndexerDeclarationSyntax? indexerSyntax,
-        CancellationToken ct)
+    private static PropertyToGenerate ConvertProperty(IPropertySymbol symbol, PropertyDeclarationSyntax syntax)
+    {
+        if (symbol.IsIndexer)
+        {
+            throw new ArgumentException("Property cannot be an indexer", nameof(symbol));
+        }
+
+        var (hasGetter, setPropertyType) = GetPropertyAccessors(symbol);
+        var trivia = syntax.HasLeadingTrivia ? syntax.GetLeadingTrivia().ToFullString() : null;
+
+        return new(syntax.Identifier.ToFullString(),
+            syntax.Type.ToFullString(),
+            null,
+            hasGetter,
+            setPropertyType,
+            trivia);
+    }
+
+    private static PropertyToGenerate ConvertIndexer(IPropertySymbol symbol, IndexerDeclarationSyntax syntax)
+    {
+        if (!symbol.IsIndexer)
+        {
+            throw new ArgumentException("Property is not an indexer", nameof(symbol));
+        }
+
+        var (hasGetter, setPropertyType) = GetPropertyAccessors(symbol);
+        var trivia = syntax.HasLeadingTrivia ? syntax.GetLeadingTrivia().ToFullString() : null;
+
+        return new("this",
+            syntax.Type.ToFullString(),
+            syntax.ParameterList.ToFullString(),
+            hasGetter,
+            setPropertyType,
+            trivia);
+    }
+
+    private static (bool HasGetter, SetPropertyType? SetPropertyType) GetPropertyAccessors(IPropertySymbol symbol)
     {
         var hasGetter = symbol.GetMethod is { DeclaredAccessibility: Accessibility.Public };
 
@@ -201,28 +240,6 @@ internal static class InterfaceExtractor
             setPropertyType = symbol.SetMethod.IsInitOnly ? SetPropertyType.Init : SetPropertyType.Set;
         }
 
-        var name = symbol.Name;
-        if (symbol.IsIndexer)
-        {
-            name = name.TrimEnd('[', ']');
-
-            if (indexerSyntax == null)
-            {
-                throw new ArgumentNullException(nameof(indexerSyntax),
-                    "Indexer syntax cannot be null when property is an indexer");
-            }
-        }
-
-        var parameters = indexerSyntax?.ParameterList.Parameters.Select(ConvertParameter).ToArray();
-
-        return new(name,
-            symbol.Type.ToDisplayString(),
-            parameters ?? Array.Empty<ParameterToGenerate>(),
-            hasGetter,
-            setPropertyType,
-            symbol.GetDocumentationCommentXml(cancellationToken: ct));
+        return (hasGetter, setPropertyType);
     }
-
-    private static ParameterToGenerate ConvertParameter(ParameterSyntax parameter) =>
-        new(parameter.ToFullString().Trim(' '));
 }
