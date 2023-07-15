@@ -10,6 +10,7 @@ public class SnapshotTests
 using System;
 using Roozie.AutoInterface;
 using System.Text;
+using FS = System.IO.FileStream;
 
 namespace Roozie.AutoInterface.Tests;
 
