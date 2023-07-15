@@ -4,6 +4,7 @@
 // </auto-generated>
 
 using System;
+using Roozie.AutoInterface;
 
 namespace Roozie.AutoInterface.Tests;
 

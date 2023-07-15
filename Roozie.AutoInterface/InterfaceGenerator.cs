@@ -9,14 +9,9 @@ internal static class InterfaceGenerator
         var sb = new StringBuilder(Helpers.GetGeneratedFileComment(version));
         sb.AppendLine().AppendLine();
 
-        foreach (var u in toGenerate.Usings.OrderBy(s => s, StringComparer.Ordinal))
+        if (!string.IsNullOrWhiteSpace(toGenerate.Usings))
         {
-            sb.Append($"using {u};").AppendLine();
-        }
-
-        if (toGenerate.Usings.Length > 0)
-        {
-            sb.AppendLine();
+            sb.AppendLine(toGenerate.Usings);
         }
 
         sb.Append("namespace ").AppendLine($"{toGenerate.Namespace};").AppendLine();

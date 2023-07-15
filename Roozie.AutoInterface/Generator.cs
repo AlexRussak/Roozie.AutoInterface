@@ -20,15 +20,19 @@ public class Generator : IIncrementalGenerator
         context.RegisterSourceOutput(interfacesToGenerate, static (spc, i) => Execute(i!.Value, spc));
     }
 
-    private static InterfaceToGenerate? Generate(GeneratorAttributeSyntaxContext context, CancellationToken token)
+    private static InterfaceToGenerate? Generate(GeneratorAttributeSyntaxContext context,
+        CancellationToken cancellationToken)
     {
-        token.ThrowIfCancellationRequested();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
 
         var attribute = context.Attributes.Single();
         return InterfaceExtractor.ProcessClass(attribute,
             context.TargetNode as ClassDeclarationSyntax,
             context.SemanticModel,
-            token);
+            cancellationToken);
     }
 
     private static void Execute(InterfaceToGenerate interfaceToGenerate, SourceProductionContext context)

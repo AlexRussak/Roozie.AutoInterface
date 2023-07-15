@@ -14,7 +14,10 @@ internal static class InterfaceExtractor
         SemanticModel semanticModel,
         CancellationToken ct = default)
     {
-        ct.ThrowIfCancellationRequested();
+        if (ct.IsCancellationRequested)
+        {
+            return null;
+        }
 
         if (classDeclarationSyntax == null)
         {
@@ -74,11 +77,6 @@ internal static class InterfaceExtractor
         }
 
         var root = classDeclarationSyntax.SyntaxTree.GetCompilationUnitRoot(ct);
-        var usings = root.Usings.Select(static u => u.Name.ToString())
-            .Where(static u =>
-                !string.IsNullOrWhiteSpace(u) && !string.Equals(u, Helpers.Namespace, StringComparison.Ordinal))
-            .OrderBy(static u => u, StringComparer.Ordinal)
-            .ToArray();
 
         var classDoc = classDeclarationSyntax.HasLeadingTrivia
             ? classDeclarationSyntax.GetLeadingTrivia().ToFullString()
@@ -87,13 +85,15 @@ internal static class InterfaceExtractor
         var ns = classSymbol.ContainingNamespace.IsGlobalNamespace
             ? string.Empty
             : classSymbol.ContainingNamespace.ToString();
+
         var implementPartial = classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                                settings.ImplementOnPartial;
+
         return new(classSymbol.DeclaredAccessibility,
             classSymbol.Name,
             settings.InterfaceName ?? "I" + classSymbol.Name,
             ns,
-            usings,
+            root.Usings.ToFullString(),
             methods.ToArray(),
             properties.ToArray(),
             classDoc,

@@ -9,7 +9,7 @@ internal readonly struct InterfaceToGenerate
         string className,
         string interfaceName,
         string ns,
-        string[] usings,
+        string usings,
         MethodToGenerate[] methods,
         PropertyToGenerate[] properties,
         string? xmlDoc,
@@ -34,7 +34,7 @@ internal readonly struct InterfaceToGenerate
         string className,
         string interfaceName,
         string ns,
-        string[] usings,
+        string usings,
         MethodToGenerate[] methods,
         PropertyToGenerate[] properties,
         string? xmlDoc,
@@ -59,7 +59,7 @@ internal readonly struct InterfaceToGenerate
     public string ClassName { get; }
     public string InterfaceName { get; }
     public string Namespace { get; }
-    public string[] Usings { get; }
+    public string Usings { get; }
     public MethodToGenerate[] Methods { get; }
     public PropertyToGenerate[] Properties { get; }
     public string? XmlDoc { get; }
@@ -77,7 +77,7 @@ internal readonly struct InterfaceToGenerate
             className,
             string.Empty,
             string.Empty,
-            Array.Empty<string>(),
+            string.Empty,
             Array.Empty<MethodToGenerate>(),
             Array.Empty<PropertyToGenerate>(),
             null,
