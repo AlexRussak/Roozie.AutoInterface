@@ -10,7 +10,7 @@ namespace Roozie.AutoInterface.Tests.Integration;
 #pragma warning disable CA1852
 
 [AutoInterface]
-public class RoozieTestClassGenerics : IRoozieTestClassGenerics
+public class RoozieTestClassGenerics<TClass, TStruct> : IRoozieTestClassGenerics<TClass, TStruct> where TClass : class
 {
     /// <summary>
     /// This is a test comment for <see cref="System.Drawing.Color"/>
@@ -23,4 +23,6 @@ public class RoozieTestClassGenerics : IRoozieTestClassGenerics
     public TOutput? TestMethod2<TInput1, TInput2, TOutput>(TInput1 input1, TInput2 input2) => default;
 
     public T TestMethod3<T>(T input) where T : class => input;
+
+    public TClass? TestMethod4(TStruct input1) => default;
 }

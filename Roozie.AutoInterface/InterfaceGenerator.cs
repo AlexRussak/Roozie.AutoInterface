@@ -19,9 +19,32 @@ internal static class InterfaceGenerator
 
         if (toGenerate.ImplementPartial)
         {
-            sb.Append($"{toGenerate.Accessibility.ToString().ToLowerInvariant()} partial class ")
-                .AppendLine($"{toGenerate.ClassName} : {toGenerate.InterfaceName} {{}}")
-                .AppendLine();
+            sb.Append($"{toGenerate.Accessibility.ToString().ToLowerInvariant()} partial class ");
+
+            sb.Append(toGenerate.ClassName);
+
+            if (toGenerate.ClassTypeParameters != null)
+            {
+                sb.Append(toGenerate.ClassTypeParameters.Trim());
+            }
+
+            sb.Append(" : ");
+
+            sb.Append(toGenerate.InterfaceName);
+
+            if (toGenerate.ClassTypeParameters != null)
+            {
+                sb.Append(toGenerate.ClassTypeParameters.Trim());
+            }
+
+            if (toGenerate.ClassTypeConstraints != null)
+            {
+                sb.Append(' ').Append(toGenerate.ClassTypeConstraints.Trim());
+            }
+
+            sb.AppendLine(" {}");
+
+            sb.AppendLine();
         }
 
         if (!string.IsNullOrWhiteSpace(toGenerate.XmlDoc))
@@ -29,7 +52,20 @@ internal static class InterfaceGenerator
             sb.AppendLine(TrimLineBreaks(toGenerate.XmlDoc!).TrimEnd());
         }
 
-        sb.AppendLine($"public partial interface {toGenerate.InterfaceName}");
+        sb.Append($"public partial interface {toGenerate.InterfaceName}");
+
+        if (toGenerate.ClassTypeParameters != null)
+        {
+            sb.Append(toGenerate.ClassTypeParameters.Trim());
+        }
+
+        if (toGenerate.ClassTypeConstraints != null)
+        {
+            sb.Append(' ').Append(toGenerate.ClassTypeConstraints.Trim());
+        }
+
+        sb.AppendLine();
+
         sb.AppendLine("{");
 
         foreach (var property in toGenerate.Properties)
