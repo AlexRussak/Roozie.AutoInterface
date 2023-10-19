@@ -203,7 +203,7 @@ using System.Drawing;
 namespace Roozie.AutoInterface.Tests;
 
 [AutoInterface]
-internal class {{nameof(GenericMethods)}}
+internal class {{nameof(GenericMethods)}}<TClass, TStruct> where TClass : class
 {
     /// <summary>
     /// This is a test comment for <see cref="System.Drawing.Color"/>
@@ -216,6 +216,8 @@ internal class {{nameof(GenericMethods)}}
     public T3? TestMethod2<T1, T2, T3>(T1 input1, T2 input2) => default;
 
     public T TestMethod3<T>(T input) where T : class => input;
+
+    public TClass? TestMethod4(TStruct input1) => default;
 }
 """;
         return TestHelper.Verify(source);

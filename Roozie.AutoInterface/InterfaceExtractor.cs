@@ -82,6 +82,12 @@ internal static class InterfaceExtractor
             ? classDeclarationSyntax.GetLeadingTrivia().ToFullString()
             : null;
 
+        var classTypeParameters = classDeclarationSyntax.TypeParameterList?.ToFullString();
+
+        var classTypeConstraints = classDeclarationSyntax.ConstraintClauses.Count > 0
+            ? classDeclarationSyntax.ConstraintClauses.ToFullString()
+            : null;
+
         var ns = classSymbol.ContainingNamespace.IsGlobalNamespace
             ? string.Empty
             : classSymbol.ContainingNamespace.ToString();
@@ -91,6 +97,8 @@ internal static class InterfaceExtractor
 
         return new(classSymbol.DeclaredAccessibility,
             classSymbol.Name,
+            classTypeParameters,
+            classTypeConstraints,
             settings.InterfaceName ?? "I" + classSymbol.Name,
             ns,
             root.Usings.ToFullString(),

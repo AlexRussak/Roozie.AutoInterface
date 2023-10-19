@@ -7,6 +7,8 @@ internal readonly struct InterfaceToGenerate
     public InterfaceToGenerate(
         Accessibility accessibility,
         string className,
+        string? classTypeParameters,
+        string? classTypeConstraints,
         string interfaceName,
         string ns,
         string usings,
@@ -17,6 +19,8 @@ internal readonly struct InterfaceToGenerate
         Location location)
         : this(accessibility,
             className,
+            classTypeParameters,
+            classTypeConstraints,
             interfaceName,
             ns,
             usings,
@@ -32,6 +36,8 @@ internal readonly struct InterfaceToGenerate
     private InterfaceToGenerate(
         Accessibility accessibility,
         string className,
+        string? classTypeParameters,
+        string? classTypeConstraints,
         string interfaceName,
         string ns,
         string usings,
@@ -44,6 +50,8 @@ internal readonly struct InterfaceToGenerate
     {
         Accessibility = accessibility;
         ClassName = className;
+        ClassTypeParameters = classTypeParameters;
+        ClassTypeConstraints = classTypeConstraints;
         InterfaceName = interfaceName;
         Namespace = ns;
         Usings = usings;
@@ -57,6 +65,8 @@ internal readonly struct InterfaceToGenerate
 
     public Accessibility Accessibility { get; }
     public string ClassName { get; }
+    public string? ClassTypeParameters { get; }
+    public string? ClassTypeConstraints { get; }
     public string InterfaceName { get; }
     public string Namespace { get; }
     public string Usings { get; }
@@ -75,6 +85,8 @@ internal readonly struct InterfaceToGenerate
     {
         return new(accessibility,
             className,
+            string.Empty,
+            string.Empty,
             string.Empty,
             string.Empty,
             string.Empty,
